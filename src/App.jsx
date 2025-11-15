@@ -43,6 +43,17 @@ export default function SecretGiftLanding() {
   // Load Razorpay on component mount
   useEffect(() => {
     loadRazorpayScript();
+    
+    // Load Razorpay Payment Button script
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/payment-button.js';
+    script.setAttribute('data-payment_button_id', 'pl_Rg21Hy2HxCCkGx');
+    script.async = true;
+    
+    const form = document.getElementById('razorpay-payment-form');
+    if (form) {
+      form.appendChild(script);
+    }
   }, []);
 
   useEffect(() => {
@@ -64,7 +75,12 @@ export default function SecretGiftLanding() {
   }, []);
 
   const handleBooking = () => {
-    setShowBookingPopup(true);
+    // Use Razorpay Payment Button instead of popup
+    const form = document.getElementById('razorpay-payment-form');
+    const button = form.querySelector('button');
+    if (button) {
+      button.click();
+    }
   };
 
   const processPayment = () => {
@@ -288,8 +304,13 @@ export default function SecretGiftLanding() {
               </div>
             </div>
 
+            {/* Razorpay Payment Button */}
+            <form id="razorpay-payment-form" className="w-full mb-4">
+              {/* Razorpay button will be injected here */}
+            </form>
+
             <button 
-              onClick={handleBooking}
+              onClick={scrollToBooking}
               className="w-full bg-pink-500 hover:bg-pink-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-pink-500/50"
             >
               Book My Secret Gift 🎁
