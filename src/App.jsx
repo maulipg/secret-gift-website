@@ -232,23 +232,107 @@ export default function SecretGiftLanding() {
       <div className="py-20 px-4 bg-slate-800/30">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 text-white">How It Works</h2>
-          <p className="text-center text-gray-400 mb-16">Simple, mysterious, magical</p>
+          <p className="text-center text-gray-300 mb-4 text-lg">Your journey to the perfect surprise</p>
+          <p className="text-center text-gray-400 mb-16 max-w-2xl mx-auto">
+            We've made it incredibly simple. Just three steps to get your mystery gift delivered straight to your door on New Year's Eve.
+          </p>
           
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
             {[
-              { icon: Lock, title: 'Pre-Book', desc: 'Secure your secret gift for just ₹199', step: '01' },
-              { icon: Calendar, title: 'Wait', desc: 'The mystery builds till 31st December', step: '02' },
-              { icon: Gift, title: 'Receive', desc: 'Get your surprise delivered to your doorstep', step: '03' }
+              { 
+                icon: Lock, 
+                title: 'Pre-Book Your Gift', 
+                desc: 'Reserve your spot for just ₹199. Pay securely online and claim one of the 999 limited gifts.',
+                step: '01',
+                detail: 'Once you book, your spot is guaranteed. No surprises with the price - delivery is included!'
+              },
+              { 
+                icon: Calendar, 
+                title: 'The Wait Begins', 
+                desc: 'Sit back and let the anticipation build. Your gift is being carefully prepared just for you.',
+                step: '02',
+                detail: 'We keep it a complete secret until 31st December. Trust us, the surprise is worth the wait!'
+              },
+              { 
+                icon: Gift, 
+                title: 'Receive & Celebrate', 
+                desc: 'Your mystery gift arrives between 31st December and 3rd January. Unwrap and start 2026 with joy!',
+                step: '03',
+                detail: 'Track your delivery and get ready to discover what\'s inside. Happy New Year! 🎉'
+              }
             ].map((item, idx) => (
-              <div key={idx} className="relative bg-slate-800/50 rounded-xl p-8 text-center border border-slate-700 hover:border-pink-500/50 transition-colors">
+              <div key={idx} className="relative bg-slate-800/50 rounded-xl p-8 text-center border border-slate-700 hover:border-pink-500/50 transition-all hover:shadow-xl">
                 <div className="absolute -top-3 -right-3 bg-pink-500 text-white rounded-lg w-10 h-10 flex items-center justify-center font-bold text-sm shadow-lg">
                   {item.step}
                 </div>
-                <item.icon className="w-12 h-12 text-pink-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2 text-white">{item.title}</h3>
-                <p className="text-gray-400 text-sm">{item.desc}</p>
+                
+                {/* Icon with gradient background */}
+                <div className="mb-6 mx-auto w-20 h-20 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-2xl flex items-center justify-center">
+                  <item.icon className="w-10 h-10 text-pink-400" />
+                </div>
+                
+                <h3 className="text-xl font-semibold mb-3 text-white">{item.title}</h3>
+                <p className="text-gray-400 text-sm mb-4 leading-relaxed">{item.desc}</p>
+                <div className="pt-4 border-t border-slate-700">
+                  <p className="text-xs text-gray-500 italic">{item.detail}</p>
+                </div>
               </div>
             ))}
+          </div>
+
+          {/* Visual Timeline */}
+          <div className="relative max-w-4xl mx-auto">
+            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 transform -translate-y-1/2 hidden md:block"></div>
+            
+            <div className="grid md:grid-cols-3 gap-8 relative z-10">
+              <div className="text-center">
+                <div className="mx-auto w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center mb-3 shadow-lg shadow-pink-500/50">
+                  <span className="text-white font-bold text-xl">1</span>
+                </div>
+                <p className="text-sm text-gray-400">Book Today</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="mx-auto w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mb-3 shadow-lg shadow-purple-500/50">
+                  <Calendar className="w-8 h-8 text-white" />
+                </div>
+                <p className="text-sm text-gray-400">Wait for Dec 31</p>
+              </div>
+              
+              <div className="text-center">
+                <div className="mx-auto w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center mb-3 shadow-lg shadow-pink-500/50">
+                  <Sparkles className="w-8 h-8 text-white" />
+                </div>
+                <p className="text-sm text-gray-400">Receive & Enjoy</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Info Section */}
+          <div className="mt-16 grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <div className="bg-gradient-to-br from-pink-900/20 to-purple-900/20 rounded-xl p-6 border border-pink-500/20">
+              <div className="flex items-start gap-4">
+                <div className="bg-pink-500/20 rounded-lg p-3">
+                  <Sparkles className="w-6 h-6 text-pink-400" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-white mb-2">What's Inside?</h4>
+                  <p className="text-sm text-gray-400">It's a mystery! Could be tech, accessories, self-care, or something completely unexpected. All we can say is - it's unique and carefully chosen.</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-xl p-6 border border-purple-500/20">
+              <div className="flex items-start gap-4">
+                <div className="bg-purple-500/20 rounded-lg p-3">
+                  <CheckCircle className="w-6 h-6 text-purple-400" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-white mb-2">Why Trust Us?</h4>
+                  <p className="text-sm text-gray-400">Last year, hundreds received their mystery gifts on time. Check our testimonials below. Your satisfaction is guaranteed!</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
