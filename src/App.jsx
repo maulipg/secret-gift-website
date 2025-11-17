@@ -178,6 +178,12 @@ export default function SecretGiftLanding() {
 
       {/* Hero Section */}
       <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
+        {/* Decorative background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-pink-500/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-r from-pink-500/5 to-purple-500/5 rounded-full blur-3xl" />
+        </div>
         
         <div className="relative z-10 text-center max-w-4xl mx-auto">
           <div className="inline-block mb-8">
@@ -261,20 +267,28 @@ export default function SecretGiftLanding() {
                 detail: 'Track your delivery and get ready to discover what\'s inside. Happy New Year! 🎉'
               }
             ].map((item, idx) => (
-              <div key={idx} className="relative bg-slate-800/50 rounded-xl p-8 text-center border border-slate-700 hover:border-pink-500/50 transition-all hover:shadow-xl">
-                <div className="absolute -top-3 -right-3 bg-pink-500 text-white rounded-lg w-10 h-10 flex items-center justify-center font-bold text-sm shadow-lg">
+              <div key={idx} className="relative bg-slate-800/50 rounded-xl overflow-hidden border border-slate-700 hover:border-pink-500/50 transition-all hover:shadow-xl">
+                <div className="absolute -top-3 -right-3 bg-pink-500 text-white rounded-lg w-10 h-10 flex items-center justify-center font-bold text-sm shadow-lg z-10">
                   {item.step}
                 </div>
                 
-                {/* Icon with gradient background */}
-                <div className="mb-6 mx-auto w-20 h-20 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-2xl flex items-center justify-center">
-                  <item.icon className="w-10 h-10 text-pink-400" />
+                {/* Decorative gradient background */}
+                <div className="h-32 bg-gradient-to-br from-pink-500/10 via-purple-500/10 to-pink-500/10 relative">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(236,72,153,0.1),transparent_50%)]" />
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2">
+                    <div className="w-20 h-20 bg-gradient-to-br from-pink-500/30 to-purple-500/30 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-pink-500/20 shadow-xl">
+                      <item.icon className="w-10 h-10 text-pink-400" />
+                    </div>
+                  </div>
                 </div>
                 
-                <h3 className="text-xl font-semibold mb-3 text-white">{item.title}</h3>
-                <p className="text-gray-400 text-sm mb-4 leading-relaxed">{item.desc}</p>
-                <div className="pt-4 border-t border-slate-700">
-                  <p className="text-xs text-gray-500 italic">{item.detail}</p>
+                <div className="p-8 pt-14 text-center">
+                
+                  <h3 className="text-xl font-semibold mb-3 text-white">{item.title}</h3>
+                  <p className="text-gray-400 text-sm mb-4 leading-relaxed">{item.desc}</p>
+                  <div className="pt-4 border-t border-slate-700">
+                    <p className="text-xs text-gray-500 italic">{item.detail}</p>
+                  </div>
                 </div>
               </div>
             ))}
@@ -364,11 +378,19 @@ export default function SecretGiftLanding() {
       </div>
 
       {/* Booking Section */}
-      <div id="booking" className="py-20 px-4 bg-slate-800/30">
-        <div className="max-w-lg mx-auto">
-          <div className="bg-slate-800/80 rounded-xl p-8 border border-slate-700 shadow-xl">
+      <div id="booking" className="py-20 px-4 bg-slate-800/30 relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-10 right-10 w-64 h-64 bg-pink-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-10 left-10 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl" />
+        
+        <div className="max-w-lg mx-auto relative z-10">
+          <div className="bg-slate-800/80 rounded-xl p-8 border border-slate-700 shadow-xl backdrop-blur-sm">
             <div className="text-center mb-8">
-              <Gift className="w-16 h-16 text-pink-400 mx-auto mb-4" />
+              {/* Animated gift box */}
+              <div className="relative inline-block mb-4">
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-full blur-xl" />
+                <Gift className="w-16 h-16 text-pink-400 relative" />
+              </div>
               <h2 className="text-3xl font-bold mb-3 text-white">Book Your Secret Gift</h2>
               <p className="text-gray-400 text-sm">Limited to 999 people. Be one of the chosen ones.</p>
             </div>
