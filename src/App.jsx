@@ -198,7 +198,7 @@ export default function SecretGiftLanding() {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=1920&q=80" 
+            src="https://images.unsplash.com/photo-1482029255085-35a4a48b7084?w=1920&q=80" 
             alt="New Year celebration" 
             className="w-full h-full object-cover opacity-20"
           />
@@ -384,15 +384,25 @@ export default function SecretGiftLanding() {
           
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { icon: Star, title: 'Exclusive', desc: 'One-of-a-kind curated experience', detail: 'Handpicked gifts you won\'t find anywhere else' },
-              { icon: Lock, title: 'Limited', desc: 'Only 999 gifts available', detail: 'Once they\'re gone, they\'re gone forever' },
-              { icon: Truck, title: 'Nationwide', desc: 'Delivered across India', detail: 'Free delivery to your doorstep, guaranteed' }
+              { icon: Star, title: 'Exclusive', desc: 'One-of-a-kind curated experience', detail: 'Handpicked gifts you won\'t find anywhere else', img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80' },
+              { icon: Lock, title: 'Limited', desc: 'Only 999 gifts available', detail: 'Once they\'re gone, they\'re gone forever', img: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&q=80' },
+              { icon: Truck, title: 'Nationwide', desc: 'Delivered across India', detail: 'Free delivery to your doorstep, guaranteed', img: 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=400&q=80' }
             ].map((item, idx) => (
-              <div key={idx} className="bg-slate-800/50 rounded-xl p-6 border border-slate-700 hover:border-pink-500/40 transition">
-                <item.icon className="w-10 h-10 text-pink-400 mx-auto mb-3" />
-                <h3 className="text-lg font-semibold mb-2 text-white">{item.title}</h3>
-                <p className="text-gray-400 text-sm mb-2">{item.desc}</p>
-                <p className="text-gray-500 text-xs italic">{item.detail}</p>
+              <div key={idx} className="bg-slate-800/50 rounded-xl overflow-hidden border border-slate-700 hover:border-pink-500/40 transition">
+                <div className="relative h-40 overflow-hidden">
+                  <img 
+                    src={item.img}
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent"></div>
+                </div>
+                <div className="p-6">
+                  <item.icon className="w-10 h-10 text-pink-400 mx-auto mb-3" />
+                  <h3 className="text-lg font-semibold mb-2 text-white">{item.title}</h3>
+                  <p className="text-gray-400 text-sm mb-2">{item.desc}</p>
+                  <p className="text-gray-500 text-xs italic">{item.detail}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -435,6 +445,24 @@ export default function SecretGiftLanding() {
                   className="w-full h-64 object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+              </div>
+
+              {/* Additional trust-building images */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="relative rounded-xl overflow-hidden">
+                  <img 
+                    src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=300&q=80"
+                    alt="Premium gift packaging"
+                    className="w-full h-32 object-cover"
+                  />
+                </div>
+                <div className="relative rounded-xl overflow-hidden">
+                  <img 
+                    src="https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=300&q=80"
+                    alt="Happy customers"
+                    className="w-full h-32 object-cover"
+                  />
+                </div>
               </div>
 
               <div className="bg-slate-800/80 rounded-xl p-6 border border-slate-700">
@@ -578,7 +606,7 @@ export default function SecretGiftLanding() {
         {/* Background decoration */}
         <div className="absolute inset-0 opacity-5">
           <img 
-            src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=1200&q=80"
+            src="https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=1200&q=80"
             alt="Gift background"
             className="w-full h-full object-cover"
           />
