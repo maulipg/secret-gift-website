@@ -20,16 +20,11 @@ Your project has 2 parts that need deployment:
    - **Name:** `secret-gift-backend`
    - **Region:** Singapore (closest to India)
    - **Branch:** `main`
-   - **Root Directory:** `secret gift` (copy-paste exactly with the space)
+   - **Root Directory:** Leave BLANK
    - **Runtime:** `Node`
-   - **Build Command:** `cd "secret gift" && npm install`
-   - **Start Command:** `cd "secret gift" && node server.js`
+   - **Build Command:** `npm install`
+   - **Start Command:** `node server.js`
    - **Instance Type:** `Free`
-
-**ALTERNATIVE: If space causes issues:**
-- Root Directory: Leave BLANK
-- Build Command: `cd "secret gift" && npm install`
-- Start Command: `cd "secret gift" && node server.js`
 
 ### 1.3 Add Environment Variables
 In Render dashboard, add these:
