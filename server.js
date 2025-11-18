@@ -12,6 +12,34 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Test endpoint to verify server is running
+app.get('/', (req, res) => {
+  res.json({
+    status: 'success',
+    message: '🚀 Secret Gift Backend Server is running!',
+    endpoints: {
+      createOrder: 'POST /api/create-order',
+      verifyPayment: 'POST /api/verify-payment',
+      health: 'GET /api/health'
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    message: 'Server is operational',
+    razorpay: {
+      configured: !!(process.env.VITE_RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET),
+      keyId: process.env.VITE_RAZORPAY_KEY_ID ? 'Set ✓' : 'Missing ✗',
+      keySecret: process.env.RAZORPAY_KEY_SECRET ? 'Set ✓' : 'Missing ✗'
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Initialize Razorpay
 const razorpay = new Razorpay({
   key_id: process.env.VITE_RAZORPAY_KEY_ID,
