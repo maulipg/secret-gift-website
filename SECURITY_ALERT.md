@@ -11,7 +11,37 @@ GitHub Guardian detected that your live Razorpay keys were exposed in your repos
 4. ✅ Committed the cleaned files
 5. ✅ Verified `.env` file is NOT in Git (it's properly ignored)
 
-### 🚨 URGENT: What YOU Must Do NOW:
+### 🚨 URGENT - DO THIS RIGHT NOW:
+
+**⚠️ YOUR RENDER BACKEND IS FAILING - Authentication Error 401**
+
+The error `Authentication failed` means your Razorpay keys are NOT set in Render's environment variables.
+
+**IMMEDIATE FIX:**
+
+**1. Go to Render Dashboard:**
+   - https://dashboard.render.com
+   - Click on your service: `secret-gift-backend` or `webpage-et86`
+
+**2. Add Environment Variables:**
+   - Click **"Environment"** tab on the left
+   - Click **"Add Environment Variable"**
+   - Add these TWO variables:
+
+   ```
+   Key: VITE_RAZORPAY_KEY_ID
+   Value: rzp_live_RhAYcnEBLNOR0V
+   
+   Key: RAZORPAY_KEY_SECRET  
+   Value: xbHQRhnfPFQ2O9TQaE1250QT
+   ```
+
+**3. Save and Redeploy:**
+   - Click **"Save Changes"**
+   - Render will automatically redeploy your service
+   - Wait 2-3 minutes for deployment
+
+**4. After Keys Are Working, THEN:**
 
 #### 1. Regenerate Your Razorpay Keys (CRITICAL - Do this first!)
 Your current keys are **compromised** and publicly exposed. You MUST regenerate them:
