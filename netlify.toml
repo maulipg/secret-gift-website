@@ -1,8 +1,16 @@
 [build]
+  base = "secret gift"
   publish = "dist"
   command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "18"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Note: Add these environment variables in Netlify Dashboard:
+# VITE_RAZORPAY_KEY_ID=rzp_live_RhAYcnEBLNOR0V
+# VITE_API_URL=your-backend-api-url (e.g., https://your-backend.onrender.com)

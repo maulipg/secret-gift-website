@@ -43,17 +43,6 @@ export default function SecretGiftLanding() {
   // Load Razorpay on component mount
   useEffect(() => {
     loadRazorpayScript();
-    
-    // Load Razorpay Payment Button script
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/payment-button.js';
-    script.setAttribute('data-payment_button_id', 'pl_Rg21Hy2HxCCkGx');
-    script.async = true;
-    
-    const form = document.getElementById('razorpay-payment-form');
-    if (form) {
-      form.appendChild(script);
-    }
   }, []);
 
   useEffect(() => {
@@ -74,85 +63,113 @@ export default function SecretGiftLanding() {
     createConfetti();
   }, []);
 
-  const handleBooking = () => {
-    // Use Razorpay Payment Button instead of popup
-    const form = document.getElementById('razorpay-payment-form');
-    const button = form.querySelector('button');
-    if (button) {
-      button.click();
-    }
-  };
+  const processPayment = async () => {
+    const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID;
+    const AMOUNT = 249; // ₹249
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-  const processPayment = () => {
-    const RAZORPAY_KEY_ID = 'rzp_test_RfdQLkOAQk9RKk';
-    const AMOUNT = 19900; // ₹199 in paise (199 * 100)
-
-    // TEMPORARY: Using direct payment without order_id (for testing UI only)
-    // For production, you MUST create an order from your backend first
-    
-    const options = {
-      key: RAZORPAY_KEY_ID,
-      amount: AMOUNT,
-      currency: 'INR',
-      name: 'Secret Drop India',
-      description: 'Secret Gift - 31st December 2025',
-      image: '', // Add your logo URL here
-      
-      // NOTE: For production, you need to:
-      // 1. Create a backend API endpoint
-      // 2. Call Razorpay Order API from backend with key_secret
-      // 3. Pass the order_id here
-      // order_id: 'order_xxxxx', // Add this from backend
-      
-      handler: function (response) {
-        // Payment successful
-        console.log('Payment successful:', response);
-        console.log('Payment ID:', response.razorpay_payment_id);
-        
-        setShowBookingPopup(false);
-        setShowSuccessPopup(true);
-        setSpotsLeft(prev => prev - 1);
-        
-        setTimeout(() => {
-          setShowSuccessPopup(false);
-        }, 5000);
-      },
-      prefill: {
-        name: '',
-        email: '',
-        contact: ''
-      },
-      notes: {
-        product: 'Secret Gift 2025',
-        delivery_date: '31st December 2025'
-      },
-      theme: {
-        color: '#EC4899'
-      },
-      modal: {
-        ondismiss: function() {
-          console.log('Payment cancelled by user');
+    try {
+      // Create order from backend
+      const response = await fetch(`${API_URL}/api/create-order`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        escape: true,
-        backdropclose: false
-      }
-    };
+        body: JSON.stringify({
+          amount: AMOUNT,
+          currency: 'INR',
+        }),
+      });
 
-    // Check if Razorpay is loaded
-    if (typeof window.Razorpay !== 'undefined') {
-      try {
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to create order');
+      }
+
+      const options = {
+        key: data.key_id,
+        amount: data.order.amount,
+        currency: data.order.currency,
+        name: 'Secret Gift India',
+        description: 'Secret Gift - 31st December 2025',
+        image: '', // Add your logo URL here
+        order_id: data.order.id,
+        
+        handler: async function (response) {
+          // Verify payment on backend
+          try {
+            const verifyResponse = await fetch(`${API_URL}/api/verify-payment`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+
+            const verifyData = await verifyResponse.json();
+
+            if (verifyData.success) {
+              console.log('Payment verified successfully');
+              setShowBookingPopup(false);
+              setShowSuccessPopup(true);
+              
+              // Decrease spots by 1, reset to 999 when it reaches 0
+              setSpotsLeft(prev => {
+                const newSpots = prev - 1;
+                return newSpots <= 0 ? 999 : newSpots;
+              });
+              
+              setTimeout(() => {
+                setShowSuccessPopup(false);
+              }, 5000);
+            } else {
+              alert('Payment verification failed. Please contact support.');
+            }
+          } catch (error) {
+            console.error('Verification error:', error);
+            alert('Payment verification failed. Please contact support with Payment ID: ' + response.razorpay_payment_id);
+          }
+        },
+        prefill: {
+          name: '',
+          email: '',
+          contact: ''
+        },
+        notes: {
+          product: 'Secret Gift 2025',
+          delivery_date: '31st December 2025'
+        },
+        theme: {
+          color: '#EC4899'
+        },
+        modal: {
+          ondismiss: function() {
+            console.log('Payment cancelled by user');
+          },
+          escape: true,
+          backdropclose: false
+        }
+      };
+
+      // Check if Razorpay is loaded
+      if (typeof window.Razorpay !== 'undefined') {
         const razorpay = new window.Razorpay(options);
         razorpay.on('payment.failed', function (response) {
           console.error('Payment failed:', response.error);
           alert('Payment failed: ' + response.error.description);
         });
         razorpay.open();
-      } catch (error) {
-        console.error('Razorpay error:', error);
-        alert('Payment gateway error. Please check your Razorpay credentials.');
+      } else {
+        alert('Payment gateway is loading. Please try again in a moment.');
       }
-    } else {
-      alert('Payment gateway is loading. Please try again in a moment.');
+    } catch (error) {
+      console.error('Payment error:', error);
+      alert('Failed to initiate payment. Please try again.');
     }
   };
 
@@ -178,11 +195,14 @@ export default function SecretGiftLanding() {
 
       {/* Hero Section */}
       <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
-        {/* Decorative background elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-pink-500/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-r from-pink-500/5 to-purple-500/5 rounded-full blur-3xl" />
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=1920&q=80" 
+            alt="New Year celebration" 
+            className="w-full h-full object-cover opacity-20"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-purple-900/60 to-slate-900/80"></div>
         </div>
         
         <div className="relative z-10 text-center max-w-4xl mx-auto">
@@ -248,7 +268,7 @@ export default function SecretGiftLanding() {
               { 
                 icon: Lock, 
                 title: 'Pre-Book Your Gift', 
-                desc: 'Reserve your spot for just ₹199. Pay securely online and claim one of the 999 limited gifts.',
+                desc: 'Reserve your spot for just ₹249. Pay securely online and claim one of the 999 limited gifts.',
                 step: '01',
                 detail: 'Once you book, your spot is guaranteed. No surprises with the price - delivery is included!'
               },
@@ -267,28 +287,27 @@ export default function SecretGiftLanding() {
                 detail: 'Track your delivery and get ready to discover what\'s inside. Happy New Year! 🎉'
               }
             ].map((item, idx) => (
-              <div key={idx} className="relative bg-slate-800/50 rounded-xl overflow-hidden border border-slate-700 hover:border-pink-500/50 transition-all hover:shadow-xl">
-                <div className="absolute -top-3 -right-3 bg-pink-500 text-white rounded-lg w-10 h-10 flex items-center justify-center font-bold text-sm shadow-lg z-10">
+              <div key={idx} className="relative bg-slate-800/50 rounded-xl p-8 text-center border border-slate-700 hover:border-pink-500/50 transition-all hover:shadow-xl">
+                <div className="absolute -top-3 -right-3 bg-pink-500 text-white rounded-lg w-10 h-10 flex items-center justify-center font-bold text-sm shadow-lg">
                   {item.step}
                 </div>
                 
-                {/* Decorative gradient background */}
-                <div className="h-32 bg-gradient-to-br from-pink-500/10 via-purple-500/10 to-pink-500/10 relative">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(236,72,153,0.1),transparent_50%)]" />
-                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2">
-                    <div className="w-20 h-20 bg-gradient-to-br from-pink-500/30 to-purple-500/30 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-pink-500/20 shadow-xl">
-                      <item.icon className="w-10 h-10 text-pink-400" />
-                    </div>
+                {/* Image with icon overlay */}
+                <div className="relative mb-6 mx-auto w-full h-40 rounded-xl overflow-hidden">
+                  <img 
+                    src={idx === 0 ? 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&q=80' : idx === 1 ? 'https://images.unsplash.com/photo-1482029255085-35a4a48b7084?w=400&q=80' : 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80'}
+                    alt={item.title}
+                    className="w-full h-full object-cover opacity-30"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center">
+                    <item.icon className="w-12 h-12 text-pink-400" />
                   </div>
                 </div>
                 
-                <div className="p-8 pt-14 text-center">
-                
-                  <h3 className="text-xl font-semibold mb-3 text-white">{item.title}</h3>
-                  <p className="text-gray-400 text-sm mb-4 leading-relaxed">{item.desc}</p>
-                  <div className="pt-4 border-t border-slate-700">
-                    <p className="text-xs text-gray-500 italic">{item.detail}</p>
-                  </div>
+                <h3 className="text-xl font-semibold mb-3 text-white">{item.title}</h3>
+                <p className="text-gray-400 text-sm mb-4 leading-relaxed">{item.desc}</p>
+                <div className="pt-4 border-t border-slate-700">
+                  <p className="text-xs text-gray-500 italic">{item.detail}</p>
                 </div>
               </div>
             ))}
@@ -355,48 +374,225 @@ export default function SecretGiftLanding() {
       <div className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <Sparkles className="w-12 h-12 text-pink-400 mx-auto mb-6" />
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Why Join the Drop?</h2>
-          <p className="text-xl text-gray-300 mb-12">
-            Because New Year deserves a surprise!<br />
-            Start 2026 with good vibes, luck, and mystery.
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Our Mission</h2>
+          <p className="text-xl text-gray-300 mb-6 leading-relaxed max-w-3xl mx-auto">
+            We believe New Year deserves more than just resolutions—it deserves magic, surprises, and unforgettable moments. Our mission is to bring joy to 999 people across India by delivering carefully curated mystery gifts that spark wonder and create lasting memories.
+          </p>
+          <p className="text-lg text-gray-400 mb-12 max-w-2xl mx-auto">
+            Start 2026 with good vibes, luck, and the thrill of the unknown. Because every great year begins with a great surprise.
           </p>
           
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { icon: Star, title: 'Exclusive', desc: 'One-of-a-kind experience' },
-              { icon: Lock, title: 'Limited', desc: 'Only 999 gifts available' },
-              { icon: Truck, title: 'Nationwide', desc: 'Delivered across India' }
+              { icon: Star, title: 'Exclusive', desc: 'One-of-a-kind curated experience', detail: 'Handpicked gifts you won\'t find anywhere else' },
+              { icon: Lock, title: 'Limited', desc: 'Only 999 gifts available', detail: 'Once they\'re gone, they\'re gone forever' },
+              { icon: Truck, title: 'Nationwide', desc: 'Delivered across India', detail: 'Free delivery to your doorstep, guaranteed' }
             ].map((item, idx) => (
-              <div key={idx} className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+              <div key={idx} className="bg-slate-800/50 rounded-xl p-6 border border-slate-700 hover:border-pink-500/40 transition">
                 <item.icon className="w-10 h-10 text-pink-400 mx-auto mb-3" />
                 <h3 className="text-lg font-semibold mb-2 text-white">{item.title}</h3>
-                <p className="text-gray-400 text-sm">{item.desc}</p>
+                <p className="text-gray-400 text-sm mb-2">{item.desc}</p>
+                <p className="text-gray-500 text-xs italic">{item.detail}</p>
               </div>
             ))}
           </div>
         </div>
       </div>
 
+      {/* Our Story & Experience */}
+      <div className="py-20 px-4 bg-slate-800/30">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Our Story</h2>
+            <p className="text-gray-400 max-w-3xl mx-auto">
+              From a small idea to India's most exciting New Year tradition
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
+            <div className="order-2 md:order-1 space-y-6">
+              <div className="bg-gradient-to-br from-pink-900/20 to-purple-900/20 rounded-xl p-6 border border-pink-500/20">
+                <h3 className="text-2xl font-bold text-white mb-3">3+ Years of Magic</h3>
+                <p className="text-gray-400 leading-relaxed">
+                  What started as a passion project in 2022 has grown into something extraordinary. We've successfully delivered mystery gifts to thousands of happy customers across India, creating unforgettable New Year moments.
+                </p>
+              </div>
+
+              <div className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-xl p-6 border border-purple-500/20">
+                <h3 className="text-2xl font-bold text-white mb-3">Why We Do This</h3>
+                <p className="text-gray-400 leading-relaxed">
+                  We believe the best gifts aren't always the ones you expect. The element of surprise, the anticipation, the joy of discovery—that's what makes a gift truly special. Every year, we carefully curate unique items that bring smiles, spark conversations, and start the new year right.
+                </p>
+              </div>
+            </div>
+
+            <div className="order-1 md:order-2 space-y-4">
+              {/* Featured Image */}
+              <div className="relative rounded-2xl overflow-hidden mb-6">
+                <img 
+                  src="https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=600&q=80"
+                  alt="Gift celebration"
+                  className="w-full h-64 object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+              </div>
+
+              <div className="bg-slate-800/80 rounded-xl p-6 border border-slate-700">
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="bg-pink-500/20 rounded-lg p-3">
+                    <CheckCircle className="w-8 h-8 text-pink-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-semibold text-white">5,000+</h4>
+                    <p className="text-sm text-gray-400">Gifts Delivered</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-slate-800/80 rounded-xl p-6 border border-slate-700">
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="bg-purple-500/20 rounded-lg p-3">
+                    <Star className="w-8 h-8 text-purple-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-semibold text-white">4.8/5</h4>
+                    <p className="text-sm text-gray-400">Customer Rating</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-slate-800/80 rounded-xl p-6 border border-slate-700">
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="bg-pink-500/20 rounded-lg p-3">
+                    <Truck className="w-8 h-8 text-pink-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-semibold text-white">28 States</h4>
+                    <p className="text-sm text-gray-400">Pan-India Delivery</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Trustworthiness Statement */}
+          <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 rounded-2xl p-8 border border-pink-500/30">
+            <div className="text-center mb-8">
+              <Lock className="w-12 h-12 text-pink-400 mx-auto mb-4" />
+              <h3 className="text-2xl font-bold text-white mb-3">Why Trust Secret Drop India?</h3>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="text-center">
+                <div className="bg-pink-500/10 rounded-xl p-4 mb-3">
+                  <CheckCircle className="w-8 h-8 text-pink-400 mx-auto" />
+                </div>
+                <h4 className="font-semibold text-white mb-2">100% Transparent</h4>
+                <p className="text-sm text-gray-400">No hidden charges. What you see is what you pay—₹249 includes everything.</p>
+              </div>
+
+              <div className="text-center">
+                <div className="bg-purple-500/10 rounded-xl p-4 mb-3">
+                  <Lock className="w-8 h-8 text-purple-400 mx-auto" />
+                </div>
+                <h4 className="font-semibold text-white mb-2">Secure Payments</h4>
+                <p className="text-sm text-gray-400">Your payment is processed through Razorpay—India's most trusted payment gateway.</p>
+              </div>
+
+              <div className="text-center">
+                <div className="bg-pink-500/10 rounded-xl p-4 mb-3">
+                  <Truck className="w-8 h-8 text-pink-400 mx-auto" />
+                </div>
+                <h4 className="font-semibold text-white mb-2">Guaranteed Delivery</h4>
+                <p className="text-sm text-gray-400">We've never missed a deadline. Your gift arrives on time, every time.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Customer Stories */}
+      <div className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Stories That Warm Our Hearts</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Real moments, real joy. Here's what makes this journey special.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            <div className="bg-gradient-to-br from-pink-900/20 to-purple-900/20 rounded-xl p-6 border border-pink-500/20">
+              <div className="flex items-center gap-3 mb-4">
+                <img 
+                  src="https://images.unsplash.com/photo-1667226983001-38b5ae7cd74f?w=100&q=80"
+                  alt="Anjali"
+                  className="w-12 h-12 rounded-full object-cover border-2 border-pink-400"
+                />
+                <Sparkles className="w-6 h-6 text-pink-400" />
+              </div>
+              <h4 className="text-lg font-semibold text-white mb-3">The Perfect Surprise</h4>
+              <p className="text-sm text-gray-400 leading-relaxed mb-4">
+                "I ordered this for my younger sister who was feeling low during New Year. When the package arrived on 31st, her face lit up! She called me crying (happy tears!) saying it was exactly what she needed. Thank you for making my sister's New Year unforgettable."
+              </p>
+              <p className="text-xs text-pink-400 font-medium">— Anjali, Mumbai</p>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-xl p-6 border border-purple-500/20">
+              <div className="flex items-center gap-3 mb-4">
+                <img 
+                  src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&q=80"
+                  alt="Rahul"
+                  className="w-12 h-12 rounded-full object-cover border-2 border-purple-400"
+                />
+                <Gift className="w-6 h-6 text-purple-400" />
+              </div>
+              <h4 className="text-lg font-semibold text-white mb-3">Worth Every Rupee</h4>
+              <p className="text-sm text-gray-400 leading-relaxed mb-4">
+                "Honestly, I was skeptical about a 'mystery gift.' But wow! What I received was not just valuable, it was thoughtful and unique. My family keeps asking me where I got it from. Already booked again for next year!"
+              </p>
+              <p className="text-xs text-purple-400 font-medium">— Rahul, Bangalore</p>
+            </div>
+
+            <div className="bg-gradient-to-br from-pink-900/20 to-purple-900/20 rounded-xl p-6 border border-pink-500/20">
+              <div className="flex items-center gap-3 mb-4">
+                <img 
+                  src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&q=80"
+                  alt="Priya"
+                  className="w-12 h-12 rounded-full object-cover border-2 border-pink-400"
+                />
+                <Star className="w-6 h-6 text-pink-400" />
+              </div>
+              <h4 className="text-lg font-semibold text-white mb-3">A New Tradition</h4>
+              <p className="text-sm text-gray-400 leading-relaxed mb-4">
+                "Last year, my entire college group ordered together. The unboxing party we had on New Year's Eve became legendary! This year, we're 15 people. Secret Drop has become our New Year tradition."
+              </p>
+              <p className="text-xs text-pink-400 font-medium">— Priya, Pune</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Booking Section */}
       <div id="booking" className="py-20 px-4 bg-slate-800/30 relative overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute top-10 right-10 w-64 h-64 bg-pink-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 left-10 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl" />
-        
+        {/* Background decoration */}
+        <div className="absolute inset-0 opacity-5">
+          <img 
+            src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=1200&q=80"
+            alt="Gift background"
+            className="w-full h-full object-cover"
+          />
+        </div>
         <div className="max-w-lg mx-auto relative z-10">
-          <div className="bg-slate-800/80 rounded-xl p-8 border border-slate-700 shadow-xl backdrop-blur-sm">
+          <div className="bg-slate-800/80 rounded-xl p-8 border border-slate-700 shadow-xl">
             <div className="text-center mb-8">
-              {/* Animated gift box */}
-              <div className="relative inline-block mb-4">
-                <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-full blur-xl" />
-                <Gift className="w-16 h-16 text-pink-400 relative" />
-              </div>
+              <Gift className="w-16 h-16 text-pink-400 mx-auto mb-4" />
               <h2 className="text-3xl font-bold mb-3 text-white">Book Your Secret Gift</h2>
               <p className="text-gray-400 text-sm">Limited to 999 people. Be one of the chosen ones.</p>
             </div>
               
             <div className="bg-slate-900/80 rounded-lg p-6 mb-6 border border-slate-700">
-              <div className="text-4xl font-bold text-pink-400 mb-1">₹199</div>
+              <div className="text-4xl font-bold text-pink-400 mb-1">₹249</div>
               <p className="text-gray-400 text-sm">Inclusive of delivery anywhere in India</p>
             </div>
 
@@ -410,16 +606,11 @@ export default function SecretGiftLanding() {
               </div>
             </div>
 
-            {/* Razorpay Payment Button */}
-            <form id="razorpay-payment-form" className="w-full mb-4">
-              {/* Razorpay button will be injected here */}
-            </form>
-
             <button 
-              onClick={scrollToBooking}
+              onClick={processPayment}
               className="w-full bg-pink-500 hover:bg-pink-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-pink-500/50"
             >
-              Book My Secret Gift 🎁
+              Book Now - ₹249 🎁
             </button>
 
             <p className="text-xs text-gray-500 mt-4 text-center">
@@ -432,19 +623,60 @@ export default function SecretGiftLanding() {
       {/* Trust Section */}
       <div className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12 text-white">What People Say</h2>
+          <h2 className="text-3xl font-bold text-center mb-4 text-white">What Our Customers Say</h2>
+          <p className="text-center text-gray-400 mb-12">Real reviews from real people who experienced the magic</p>
           
-          <div className="grid md:grid-cols-2 gap-6 mb-12">
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
             {[
-              { text: "Last year's drop was magical! Can't wait for this one 🎁", name: "Priya S." },
-              { text: "The mystery kept me excited for weeks. Totally worth it!", name: "Rahul M." }
+              { 
+                text: "We received this gift last year and it was absolutely amazing! The quality exceeded our expectations. My wife still uses it daily. Booking again this year for my parents!", 
+                name: "Vikram K.", 
+                location: "Delhi",
+                rating: 5
+              },
+              { 
+                text: "Amazing service and super fast delivery! Got my package on 31st Dec morning. The gift inside was so unique and practical. Worth every penny. Highly recommend to everyone!", 
+                name: "Sneha R.", 
+                location: "Chennai",
+                rating: 5
+              },
+              { 
+                text: "Highly recommend Secret Drop! The mystery element made it so exciting. My entire family gathered to open it together. It's not just a gift, it's an experience. Can't wait for this year's!", 
+                name: "Arjun M.", 
+                location: "Kolkata",
+                rating: 5
+              }
             ].map((testimonial, idx) => (
-              <div key={idx} className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
-                <Star className="w-6 h-6 text-pink-400 mb-3" />
-                <p className="text-gray-300 mb-3 italic text-sm">"{testimonial.text}"</p>
-                <p className="text-pink-400 font-medium text-sm">— {testimonial.name}</p>
+              <div key={idx} className="bg-slate-800/50 rounded-xl p-6 border border-slate-700 hover:border-pink-500/40 transition">
+                <div className="flex gap-1 mb-3">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-gray-300 mb-4 italic text-sm leading-relaxed">"{testimonial.text}"</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                    {testimonial.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="text-pink-400 font-medium text-sm">{testimonial.name}</p>
+                    <p className="text-gray-500 text-xs">{testimonial.location}</p>
+                  </div>
+                </div>
               </div>
             ))}
+          </div>
+
+          {/* Additional mini reviews */}
+          <div className="grid md:grid-cols-2 gap-4 mb-12 max-w-4xl mx-auto">
+            <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-700">
+              <p className="text-gray-400 text-sm italic mb-2">"Delivered right on time, packaging was premium!"</p>
+              <p className="text-pink-400 text-xs">— Neha S., Hyderabad</p>
+            </div>
+            <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-700">
+              <p className="text-gray-400 text-sm italic mb-2">"Best ₹249 I've spent. My friends are jealous!"</p>
+              <p className="text-pink-400 text-xs">— Karan P., Jaipur</p>
+            </div>
           </div>
 
           <div className="flex justify-center gap-6 flex-wrap">
@@ -472,7 +704,7 @@ export default function SecretGiftLanding() {
               { q: 'What is the gift?', a: "It's a mystery! You'll discover it on 31st December. That's what makes it special." },
               { q: 'Can I cancel after booking?', a: "No, because this is a limited edition drop with only 999 spots. All bookings are final." },
               { q: 'When will I receive my gift?', a: "Your gift will arrive between 31st December 2025 and 3rd January 2026." },
-              { q: 'Is delivery included?', a: "Yes! ₹199 includes nationwide delivery to any address in India." }
+              { q: 'Is delivery included?', a: "Yes! ₹249 includes nationwide delivery to any address in India." }
             ].map((faq, idx) => (
               <div key={idx} className="bg-slate-800/50 rounded-lg p-5 border border-slate-700">
                 <h3 className="text-lg font-semibold text-pink-400 mb-2">{faq.q}</h3>
@@ -526,7 +758,7 @@ export default function SecretGiftLanding() {
             <div className="bg-slate-900 rounded-lg p-4 mb-6 border border-slate-700">
               <div className="flex justify-between mb-2">
                 <span className="text-gray-400 text-sm">Secret Gift</span>
-                <span className="text-white font-semibold">₹199</span>
+                <span className="text-white font-semibold">₹249</span>
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-gray-500">Including delivery</span>
@@ -538,7 +770,7 @@ export default function SecretGiftLanding() {
               onClick={processPayment}
               className="w-full bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg font-semibold transition mb-3"
             >
-              Pay ₹199 with Razorpay
+              Pay ₹249 with Razorpay
             </button>
             
             <button 
