@@ -41,7 +41,7 @@ Your Razorpay live keys are now securely configured:
 1. Go to Netlify Dashboard → Your Site → Site Settings → Environment Variables
 2. Add these variables:
    ```
-   VITE_RAZORPAY_KEY_ID = rzp_live_RhAYcnEBLNOR0V
+   VITE_RAZORPAY_KEY_ID = your_razorpay_live_key_id
    VITE_API_URL = <your-backend-url>
    ```
 3. Deploy: `npm run build`
@@ -54,8 +54,8 @@ Your Razorpay live keys are now securely configured:
 3. Connect your GitHub repo
 4. Set these environment variables:
    ```
-   VITE_RAZORPAY_KEY_ID = rzp_live_RhAYcnEBLNOR0V
-   RAZORPAY_KEY_SECRET = xbHQRhnfPFQ2O9TQaE1250QT
+   VITE_RAZORPAY_KEY_ID = your_razorpay_live_key_id
+   RAZORPAY_KEY_SECRET = your_razorpay_live_secret_key
    ```
 4. Build Command: `npm install`
 5. Start Command: `node server.js`
@@ -86,20 +86,20 @@ secret gift/
 
 ### `.env` file (Local Development)
 ```
-VITE_RAZORPAY_KEY_ID=rzp_live_RhAYcnEBLNOR0V
-RAZORPAY_KEY_SECRET=xbHQRhnfPFQ2O9TQaE1250QT
+VITE_RAZORPAY_KEY_ID=your_razorpay_live_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_live_secret_key
 ```
 
 ### Netlify Dashboard (Frontend)
 ```
-VITE_RAZORPAY_KEY_ID=rzp_live_RhAYcnEBLNOR0V
+VITE_RAZORPAY_KEY_ID=your_razorpay_live_key_id
 VITE_API_URL=https://your-backend.herokuapp.com
 ```
 
 ### Backend Hosting (Render/Railway/Heroku)
 ```
-VITE_RAZORPAY_KEY_ID=rzp_live_RhAYcnEBLNOR0V
-RAZORPAY_KEY_SECRET=xbHQRhnfPFQ2O9TQaE1250QT
+VITE_RAZORPAY_KEY_ID=your_razorpay_live_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_live_secret_key
 PORT=3001
 ```
 

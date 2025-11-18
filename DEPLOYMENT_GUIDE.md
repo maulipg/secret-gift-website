@@ -29,14 +29,16 @@ Your project has 2 parts that need deployment:
 ### 1.3 Add Environment Variables
 In Render dashboard, add these:
 ```
-VITE_RAZORPAY_KEY_ID = rzp_live_RhAYcnEBLNOR0V
-RAZORPAY_KEY_SECRET = xbHQRhnfPFQ2O9TQaE1250QT
+VITE_RAZORPAY_KEY_ID = your_razorpay_live_key_id
+RAZORPAY_KEY_SECRET = your_razorpay_live_secret_key
 ```
+
+**⚠️ IMPORTANT:** Replace with your actual keys from Razorpay dashboard
 
 ### 1.4 Deploy
 - Click **"Create Web Service"**
 - Wait 2-3 minutes for deployment
-- Copy your backend URL: `https://secret-gift-backend.onrender.com`
+- Your backend URL is: **https://webpage-et86.onrender.com** ✅
 
 ---
 
@@ -56,7 +58,7 @@ RAZORPAY_KEY_SECRET = xbHQRhnfPFQ2O9TQaE1250QT
 ### 2.1 Update Environment Variables Locally
 1. Edit `.env` file:
 ```env
-VITE_RAZORPAY_KEY_ID=rzp_live_RhAYcnEBLNOR0V
+VITE_RAZORPAY_KEY_ID=your_razorpay_live_key_id
 VITE_API_URL=https://secret-gift-backend.onrender.com
 ```
 
@@ -88,7 +90,7 @@ netlify deploy --prod --dir=dist
 1. Go to: **Site Settings** → **Environment Variables**
 2. Add:
 ```
-VITE_RAZORPAY_KEY_ID = rzp_live_RhAYcnEBLNOR0V
+VITE_RAZORPAY_KEY_ID = your_razorpay_live_key_id
 VITE_API_URL = https://secret-gift-backend.onrender.com
 ```
 
@@ -133,8 +135,8 @@ cd 'secret gift'
 railway init
 
 # Add variables
-railway variables set VITE_RAZORPAY_KEY_ID=rzp_live_RhAYcnEBLNOR0V
-railway variables set RAZORPAY_KEY_SECRET=xbHQRhnfPFQ2O9TQaE1250QT
+railway variables set VITE_RAZORPAY_KEY_ID=your_razorpay_live_key_id
+railway variables set RAZORPAY_KEY_SECRET=your_razorpay_live_secret_key
 
 # Deploy
 railway up
