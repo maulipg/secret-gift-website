@@ -2,6 +2,7 @@ services:
   - type: web
     name: secret-gift-backend
     runtime: node
+    rootDir: ./secret gift
     buildCommand: npm install
     startCommand: node server.js
     envVars:

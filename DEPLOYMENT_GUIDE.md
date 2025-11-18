@@ -20,11 +20,16 @@ Your project has 2 parts that need deployment:
    - **Name:** `secret-gift-backend`
    - **Region:** Singapore (closest to India)
    - **Branch:** `main`
-   - **Root Directory:** `secret gift`
+   - **Root Directory:** `secret gift` (copy-paste exactly with the space)
    - **Runtime:** `Node`
-   - **Build Command:** `npm install`
-   - **Start Command:** `node server.js`
+   - **Build Command:** `cd "secret gift" && npm install`
+   - **Start Command:** `cd "secret gift" && node server.js`
    - **Instance Type:** `Free`
+
+**ALTERNATIVE: If space causes issues:**
+- Root Directory: Leave BLANK
+- Build Command: `cd "secret gift" && npm install`
+- Start Command: `cd "secret gift" && node server.js`
 
 ### 1.3 Add Environment Variables
 In Render dashboard, add these:
@@ -41,6 +46,17 @@ RAZORPAY_KEY_SECRET = xbHQRhnfPFQ2O9TQaE1250QT
 ---
 
 ## 🌐 STEP 2: Deploy Frontend to Netlify
+
+### IMPORTANT: Netlify Build Settings
+
+**Before deploying, configure these settings in Netlify:**
+
+1. Go to **Site Settings** → **Build & Deploy** → **Build Settings**
+2. Set:
+   - **Base directory:** `secret gift`
+   - **Build command:** `npm run build`
+   - **Publish directory:** `secret gift/dist`
+   - **Node version:** `18`
 
 ### 2.1 Update Environment Variables Locally
 1. Edit `.env` file:
