@@ -7,7 +7,23 @@ const router = express.Router();
 // Create Order
 router.post('/create-order', async (req, res) => {
   try {
+    // Check if Razorpay is configured
+    if (!razorpay) {
+      return res.status(503).json({
+        success: false,
+        message: 'Payment service not configured. Please add VITE_RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to environment variables.',
+        configured: false
+      });
+    }
+
     const { amount, currency = 'INR' } = req.body;
+
+    if (!amount || amount <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid amount provided'
+      });
+    }
 
     const options = {
       amount: amount * 100, // Amount in paise
