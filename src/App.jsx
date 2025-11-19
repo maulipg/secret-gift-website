@@ -15,8 +15,10 @@ export default function SecretGiftLanding() {
   const [scrollSpeed, setScrollSpeed] = useState(0);
   const [giftBoxRotation, setGiftBoxRotation] = useState(0);
   const [isGiftOpening, setIsGiftOpening] = useState(false);
+  const [isGiftClosing, setIsGiftClosing] = useState(false);
   const lastScrollY = useRef(0);
   const lastScrollTime = useRef(Date.now());
+  const openingTimer = useRef(null);
   
   const observerRef = useRef(null);
 
@@ -34,14 +36,31 @@ export default function SecretGiftLanding() {
       
       // Update rotation based on scroll direction and speed
       setGiftBoxRotation(prev => {
-        const rotation = prev + (scrollDiff * (speed > 5 ? 2 : 0.5));
+        const multiplier = speed > 10 ? 3 : speed > 5 ? 1.5 : 0.8;
+        const rotation = prev + (scrollDiff * multiplier);
         return rotation % 360;
       });
 
       // Trigger gift opening on fast scroll
-      if (speed > 20 && !isGiftOpening) {
+      if (speed > 15 && !isGiftOpening && !isGiftClosing) {
+        // Clear any existing timer
+        if (openingTimer.current) {
+          clearTimeout(openingTimer.current);
+        }
+        
         setIsGiftOpening(true);
-        setTimeout(() => setIsGiftOpening(false), 600);
+        setIsGiftClosing(false);
+        
+        // Start closing animation after 1 second
+        openingTimer.current = setTimeout(() => {
+          setIsGiftOpening(false);
+          setIsGiftClosing(true);
+          
+          // Remove closing class after animation completes
+          setTimeout(() => {
+            setIsGiftClosing(false);
+          }, 800);
+        }, 1000);
       }
       
       setScrollY(currentScrollY);
@@ -50,8 +69,13 @@ export default function SecretGiftLanding() {
     };
     
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isGiftOpening]);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (openingTimer.current) {
+        clearTimeout(openingTimer.current);
+      }
+    };
+  }, [isGiftOpening, isGiftClosing]);
 
   // Intersection Observer for scroll animations
   useEffect(() => {
@@ -283,9 +307,15 @@ export default function SecretGiftLanding() {
       {scrollY > 100 && (
         <div className="floating-gift-box">
           <div 
-            className={`gift-box-container ${isGiftOpening ? 'opening' : ''}`}
+            className={`gift-box-container ${isGiftOpening ? 'opening' : ''} ${isGiftClosing ? 'closing' : ''}`}
             style={{ 
-              transform: `rotateY(${giftBoxRotation}deg) rotateX(${Math.sin(giftBoxRotation * Math.PI / 180) * 10}deg)` 
+              transform: `
+                perspective(1000px)
+                rotateY(${giftBoxRotation}deg) 
+                rotateX(${Math.sin(giftBoxRotation * Math.PI / 180) * 15}deg)
+                rotateZ(${Math.cos(giftBoxRotation * Math.PI / 90) * 5}deg)
+                scale(${scrollSpeed > 10 ? 1.1 : 1})
+              ` 
             }}
           >
             {/* Gift Sparkles */}
