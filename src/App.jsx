@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Gift, Sparkles, Lock, Truck, Star, Calendar, CheckCircle, Mail, Instagram, Youtube } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Gift, Sparkles, Lock, Truck, Star, Calendar, CheckCircle, Mail, Instagram, Youtube, Heart, Users, Package } from 'lucide-react';
 
 export default function SecretGiftLanding() {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -9,6 +9,29 @@ export default function SecretGiftLanding() {
   const [confetti, setConfetti] = useState([]);
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [floatingHearts, setFloatingHearts] = useState([]);
+  
+  const observerRef = useRef(null);
+
+  // Intersection Observer for scroll animations
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -100px 0px' }
+    );
+
+    document.querySelectorAll('.scroll-reveal').forEach((el) => {
+      observerRef.current?.observe(el);
+    });
+
+    return () => observerRef.current?.disconnect();
+  }, []);
 
   useEffect(() => {
     const targetDate = new Date('2025-12-31T23:59:59');
@@ -63,6 +86,22 @@ export default function SecretGiftLanding() {
       setConfetti(newConfetti);
     };
     createConfetti();
+
+    // Create floating hearts
+    const heartInterval = setInterval(() => {
+      setFloatingHearts(prev => [...prev, {
+        id: Date.now(),
+        left: Math.random() * 100,
+        duration: 3 + Math.random() * 2
+      }]);
+      
+      // Clean up old hearts
+      setTimeout(() => {
+        setFloatingHearts(prev => prev.slice(1));
+      }, 5000);
+    }, 2000);
+
+    return () => clearInterval(heartInterval);
   }, []);
 
   const processPayment = async () => {
@@ -208,163 +247,329 @@ export default function SecretGiftLanding() {
         />
       ))}
 
-      {/* Hero Section */}
+      {/* Hero Section - Emotional & Animated */}
       <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
-        {/* Background Image */}
+        {/* Animated Background */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1482029255085-35a4a48b7084?w=1920&q=80" 
-            alt="New Year celebration" 
-            className="w-full h-full object-cover opacity-20"
+            src="https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=1920&q=80" 
+            alt="Gift giving moment" 
+            className="w-full h-full object-cover opacity-30"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-purple-900/60 to-slate-900/80"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-pink-900/80 via-purple-900/70 to-slate-900/90"></div>
         </div>
+
+        {/* Floating hearts animation */}
+        {floatingHearts.map(heart => (
+          <div
+            key={heart.id}
+            className="absolute z-5 text-pink-400/40 animate-floatUp"
+            style={{ 
+              left: `${heart.left}%`, 
+              bottom: '-50px',
+              animationDuration: `${heart.duration}s`
+            }}
+          >
+            <Heart className="w-6 h-6" fill="currentColor" />
+          </div>
+        ))}
         
-        <div className="relative z-10 text-center max-w-4xl mx-auto">
-          <div className="inline-block mb-8">
-            <Gift className="w-16 h-16 text-pink-400 mx-auto" />
+        <div className="relative z-10 text-center max-w-5xl mx-auto">
+          {/* Animated Gift Icon */}
+          <div className="inline-block mb-8 animate-giftUnwrap">
+            <div className="relative">
+              <Gift className="w-20 h-20 text-pink-400 mx-auto drop-shadow-2xl" />
+              <Sparkles className="w-8 h-8 text-yellow-400 absolute -top-2 -right-2 animate-pulse" />
+            </div>
           </div>
           
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white">
-            The Secret Gift Drop
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white leading-tight scroll-reveal">
+            Give the Gift of
+            <span className="block gradient-text text-6xl md:text-8xl mt-2">
+              Pure Joy ✨
+            </span>
           </h1>
           
-          <p className="text-2xl md:text-3xl text-pink-400 mb-3 font-medium">
-            31st December 2025
-          </p>
-          
-          <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Something unique and magical awaits you.<br />
-            <span className="text-pink-400 font-medium">Only 999 people will get it.</span>
+          <p className="text-xl md:text-2xl text-gray-200 mb-6 max-w-3xl mx-auto leading-relaxed scroll-reveal">
+            Whether it's for <span className="text-pink-400 font-semibold">your mom</span>, 
+            <span className="text-purple-400 font-semibold"> your partner</span>, 
+            <span className="text-yellow-400 font-semibold"> your sister</span>, or even 
+            <span className="text-green-400 font-semibold"> yourself</span> — 
+            every moment deserves to be celebrated with a heartfelt surprise.
           </p>
 
-          {/* Countdown Timer */}
-          <div className="flex justify-center gap-4 mb-10 flex-wrap">
-            {[
-              { label: 'Days', value: timeLeft.days },
-              { label: 'Hours', value: timeLeft.hours },
-              { label: 'Minutes', value: timeLeft.minutes },
-              { label: 'Seconds', value: timeLeft.seconds }
-            ].map((item, idx) => (
-              <div key={idx} className="bg-slate-800/80 rounded-xl p-4 min-w-[80px] border border-slate-700">
-                <div className="text-3xl font-bold text-pink-400">{item.value.toString().padStart(2, '0')}</div>
-                <div className="text-xs text-gray-400 uppercase tracking-wide mt-1">{item.label}</div>
-              </div>
-            ))}
+          <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed scroll-reveal">
+            <Heart className="inline w-5 h-5 text-red-400 animate-heartbeat" /> 
+            {' '}Not just for New Year's Eve. Not just for birthdays.{' '}
+            <span className="text-pink-400 font-medium">For any moment that matters.</span>
+          </p>
+
+          {/* Emotional callout boxes */}
+          <div className="grid md:grid-cols-3 gap-4 mb-10 max-w-4xl mx-auto scroll-reveal">
+            <div className="glass rounded-xl p-4 border-pink-400/30 hover:border-pink-400/60 transition-all">
+              <Heart className="w-8 h-8 text-pink-400 mx-auto mb-2" />
+              <p className="text-sm text-gray-200 font-medium">Surprise Someone Special</p>
+            </div>
+            <div className="glass rounded-xl p-4 border-purple-400/30 hover:border-purple-400/60 transition-all">
+              <Users className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+              <p className="text-sm text-gray-200 font-medium">Celebrate Every Occasion</p>
+            </div>
+            <div className="glass rounded-xl p-4 border-yellow-400/30 hover:border-yellow-400/60 transition-all">
+              <Package className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
+              <p className="text-sm text-gray-200 font-medium">Thoughtfully Curated</p>
+            </div>
           </div>
 
-          {/* Spots Left */}
-          <div className="inline-block bg-pink-500/10 border border-pink-500/30 rounded-lg px-5 py-2 mb-10">
-            <span className="text-pink-400 font-medium text-sm">⚡ Only {spotsLeft} spots remaining</span>
+          {/* Countdown Timer - Styled */}
+          <div className="mb-8 scroll-reveal">
+            <p className="text-sm text-gray-400 mb-4 uppercase tracking-widest">Special Drop Countdown</p>
+            <div className="flex justify-center gap-3 flex-wrap">
+              {[
+                { label: 'Days', value: timeLeft.days },
+                { label: 'Hours', value: timeLeft.hours },
+                { label: 'Minutes', value: timeLeft.minutes },
+                { label: 'Seconds', value: timeLeft.seconds }
+              ].map((item, idx) => (
+                <div key={idx} className="glass rounded-2xl p-4 min-w-[90px] border-pink-400/20 hover:border-pink-400/50 transition-all backdrop-blur-xl">
+                  <div className="text-4xl font-bold gradient-text">{item.value.toString().padStart(2, '0')}</div>
+                  <div className="text-xs text-gray-400 uppercase tracking-widest mt-1">{item.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div>
+          {/* Spots Left with shimmer */}
+          <div className="inline-block glass rounded-lg px-6 py-3 mb-10 border-pink-400/30 shimmer scroll-reveal">
+            <span className="text-pink-400 font-semibold text-lg">⚡ {spotsLeft} of 999 spots left</span>
+          </div>
+
+          <div className="scroll-reveal">
             <button 
               onClick={scrollToBooking}
-              className="bg-pink-500 hover:bg-pink-600 text-white px-10 py-4 rounded-lg text-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-pink-500/50"
+              className="group bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 hover:from-pink-600 hover:via-purple-600 hover:to-pink-600 text-white px-12 py-5 rounded-full text-xl font-bold transition-all duration-300 shadow-2xl hover:shadow-pink-500/50 transform hover:scale-105"
             >
-              Book Now 🎁
+              <span className="flex items-center gap-3">
+                Book Your Gift Now
+                <Gift className="w-6 h-6 group-hover:animate-bounce" />
+              </span>
             </button>
+            <p className="text-gray-400 text-sm mt-4">
+              💝 Starting at just ₹249 • Free Delivery • Surprise Guaranteed
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Emotional Story Section - NEW */}
+      <div className="py-24 px-4 bg-gradient-to-b from-slate-900 to-slate-800 relative overflow-hidden">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16 scroll-reveal">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">
+              Every Gift Tells a <span className="gradient-text">Story</span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              Imagine the smile when your loved one opens something they never expected. 
+              The warmth. The connection. The memory that lasts forever.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
+            {/* For Her */}
+            <div className="scroll-reveal">
+              <div className="relative group">
+                <img 
+                  src="https://images.unsplash.com/photo-1549887534-1541e9326642?w=800&q=80" 
+                  alt="Gift for her" 
+                  className="rounded-2xl shadow-2xl transform group-hover:scale-105 transition-all duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-pink-900/80 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end p-6">
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-2">For Your Loved Ones</h3>
+                    <p className="text-gray-200">Mom, girlfriend, sister, wife — make them feel cherished</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="scroll-reveal space-y-6">
+              <div className="glass rounded-xl p-6 border-pink-400/20 hover:border-pink-400/50 transition-all">
+                <Heart className="w-10 h-10 text-pink-400 mb-3" />
+                <h3 className="text-2xl font-bold text-white mb-3">💝 For Your Mother</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  She gave you everything. Now give her a moment of pure delight. 
+                  A surprise that says "Thank you for being you."
+                </p>
+              </div>
+
+              <div className="glass rounded-xl p-6 border-purple-400/20 hover:border-purple-400/50 transition-all">
+                <Sparkles className="w-10 h-10 text-purple-400 mb-3" />
+                <h3 className="text-2xl font-bold text-white mb-3">💜 For Your Partner</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  Keep the spark alive. Show them they're always on your mind 
+                  with a thoughtful gift that arrives when they least expect it.
+                </p>
+              </div>
+
+              <div className="glass rounded-xl p-6 border-yellow-400/20 hover:border-yellow-400/50 transition-all">
+                <Star className="w-10 h-10 text-yellow-400 mb-3" />
+                <h3 className="text-2xl font-bold text-white mb-3">✨ For Yourself</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  You deserve it too! Treat yourself to something special. 
+                  Self-love is the best love.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* For Him / Universal */}
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="scroll-reveal order-2 md:order-1 space-y-6">
+              <div className="glass rounded-xl p-6 border-blue-400/20 hover:border-blue-400/50 transition-all">
+                <Gift className="w-10 h-10 text-blue-400 mb-3" />
+                <h3 className="text-2xl font-bold text-white mb-3">🎁 For Any Occasion</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  Birthdays, anniversaries, or just because — there's no wrong time 
+                  to make someone feel special.
+                </p>
+              </div>
+
+              <div className="glass rounded-xl p-6 border-green-400/20 hover:border-green-400/50 transition-all">
+                <Users className="w-10 h-10 text-green-400 mb-3" />
+                <h3 className="text-2xl font-bold text-white mb-3">💚 For Your Best Friend</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  Celebrate your bond. Remind them why they're irreplaceable 
+                  with a surprise that speaks volumes.
+                </p>
+              </div>
+
+              <div className="glass rounded-xl p-6 border-red-400/20 hover:border-red-400/50 transition-all">
+                <CheckCircle className="w-10 h-10 text-red-400 mb-3" />
+                <h3 className="text-2xl font-bold text-white mb-3">❤️ For Family</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  Strengthen bonds. Create memories. Show gratitude. 
+                  Family deserves your thoughtfulness.
+                </p>
+              </div>
+            </div>
+
+            <div className="scroll-reveal order-1 md:order-2">
+              <div className="relative group">
+                <img 
+                  src="https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=800&q=80" 
+                  alt="Gift giving" 
+                  className="rounded-2xl shadow-2xl transform group-hover:scale-105 transition-all duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-purple-900/80 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end p-6">
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-2">Universal Gifting</h3>
+                    <p className="text-gray-200">Perfect for everyone, every time</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* How It Works */}
-      <div className="py-20 px-4 bg-slate-800/30">
+      <div className="py-20 px-4 bg-slate-800/50">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 text-white">How It Works</h2>
-          <p className="text-center text-gray-300 mb-4 text-lg">Your journey to the perfect surprise</p>
-          <p className="text-center text-gray-400 mb-16 max-w-2xl mx-auto">
-            We've made it incredibly simple. Just three steps to get your mystery gift delivered straight to your door on New Year's Eve.
+          <h2 className="text-3xl md:text-5xl font-bold text-center mb-4 text-white scroll-reveal">How It Works</h2>
+          <p className="text-center text-gray-300 mb-4 text-xl scroll-reveal">Simple. Thoughtful. Magical.</p>
+          <p className="text-center text-gray-400 mb-16 max-w-2xl mx-auto scroll-reveal">
+            Three easy steps to create a moment of pure joy. No hassle, just happiness.
           </p>
           
           <div className="grid md:grid-cols-3 gap-8 mb-12">
             {[
               { 
                 icon: Lock, 
-                title: 'Pre-Book Your Gift', 
-                desc: 'Reserve your spot for just ₹249. Pay securely online and claim one of the 999 limited gifts.',
+                title: 'Book Your Surprise', 
+                desc: 'Reserve your spot for just ₹249. Secure payment, guaranteed delivery.',
                 step: '01',
-                detail: 'Once you book, your spot is guaranteed. No surprises with the price - delivery is included!'
+                detail: 'Limited to 999 gifts. Once you book, your gift is secured.',
+                color: 'pink'
               },
               { 
                 icon: Calendar, 
                 title: 'The Wait Begins', 
                 desc: 'Sit back and let the anticipation build. Your gift is being carefully prepared just for you.',
                 step: '02',
-                detail: 'We keep it a complete secret until 31st December. Trust us, the surprise is worth the wait!'
+                detail: 'We keep it a complete secret until 31st December. Trust us, the surprise is worth the wait!',
+                color: 'purple'
               },
               { 
                 icon: Gift, 
                 title: 'Receive & Celebrate', 
                 desc: 'Your mystery gift arrives between 31st December and 3rd January. Unwrap and start 2026 with joy!',
                 step: '03',
-                detail: 'Track your delivery and get ready to discover what\'s inside. Happy New Year! 🎉'
+                detail: 'Track your delivery and get ready to discover what\'s inside. Happy New Year! 🎉',
+                color: 'yellow'
               }
             ].map((item, idx) => (
-              <div key={idx} className="relative bg-slate-800/50 rounded-xl p-8 text-center border border-slate-700 hover:border-pink-500/50 transition-all hover:shadow-xl">
-                <div className="absolute -top-3 -right-3 bg-pink-500 text-white rounded-lg w-10 h-10 flex items-center justify-center font-bold text-sm shadow-lg">
+              <div key={idx} className="relative glass rounded-2xl p-8 text-center border-slate-700 hover:border-pink-400/50 transition-all hover:shadow-2xl hover:scale-105 duration-300 scroll-reveal">
+                <div className={`absolute -top-4 -right-4 bg-gradient-to-br from-${item.color}-400 to-${item.color}-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-lg shadow-lg`}>
                   {item.step}
                 </div>
                 
                 {/* Image with icon overlay */}
-                <div className="relative mb-6 mx-auto w-full h-40 rounded-xl overflow-hidden">
+                <div className="relative mb-6 mx-auto w-full h-48 rounded-xl overflow-hidden group">
                   <img 
-                    src={idx === 0 ? 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&q=80' : idx === 1 ? 'https://images.unsplash.com/photo-1482029255085-35a4a48b7084?w=400&q=80' : 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80'}
+                    src={idx === 0 ? 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&q=80' : idx === 1 ? 'https://images.unsplash.com/photo-1512909006721-3d6018887383?w=400&q=80' : 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=400&q=80'}
                     alt={item.title}
-                    className="w-full h-full object-cover opacity-30"
+                    className="w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-all duration-500 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center">
-                    <item.icon className="w-12 h-12 text-pink-400" />
+                  <div className={`absolute inset-0 bg-gradient-to-br from-${item.color}-500/30 to-purple-500/30 flex items-center justify-center`}>
+                    <item.icon className={`w-16 h-16 text-${item.color}-300 drop-shadow-2xl group-hover:scale-125 transition-all`} />
                   </div>
                 </div>
                 
-                <h3 className="text-xl font-semibold mb-3 text-white">{item.title}</h3>
-                <p className="text-gray-400 text-sm mb-4 leading-relaxed">{item.desc}</p>
-                <div className="pt-4 border-t border-slate-700">
-                  <p className="text-xs text-gray-500 italic">{item.detail}</p>
+                <h3 className="text-2xl font-bold mb-3 text-white">{item.title}</h3>
+                <p className="text-gray-300 text-base mb-4 leading-relaxed">{item.desc}</p>
+                <div className={`pt-4 border-t border-${item.color}-400/20`}>
+                  <p className="text-sm text-gray-400 italic">{item.detail}</p>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Visual Timeline */}
-          <div className="relative max-w-4xl mx-auto">
-            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 transform -translate-y-1/2 hidden md:block"></div>
+          {/* Visual Timeline - Animated */}
+          <div className="relative max-w-4xl mx-auto mt-16 scroll-reveal">
+            <div className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-yellow-500 transform -translate-y-1/2 hidden md:block rounded-full shadow-lg"></div>
             
             <div className="grid md:grid-cols-3 gap-8 relative z-10">
               <div className="text-center">
-                <div className="mx-auto w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center mb-3 shadow-lg shadow-pink-500/50">
-                  <span className="text-white font-bold text-xl">1</span>
+                <div className="mx-auto w-20 h-20 bg-gradient-to-br from-pink-400 to-pink-600 rounded-full flex items-center justify-center mb-4 shadow-2xl shadow-pink-500/50 hover:scale-110 transition-all cursor-pointer">
+                  <Lock className="w-10 h-10 text-white" />
                 </div>
-                <p className="text-sm text-gray-400">Book Today</p>
+                <p className="text-base text-gray-300 font-semibold">Book Today</p>
               </div>
               
               <div className="text-center">
-                <div className="mx-auto w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mb-3 shadow-lg shadow-purple-500/50">
-                  <Calendar className="w-8 h-8 text-white" />
+                <div className="mx-auto w-20 h-20 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center mb-4 shadow-2xl shadow-purple-500/50 hover:scale-110 transition-all cursor-pointer">
+                  <Calendar className="w-10 h-10 text-white" />
                 </div>
-                <p className="text-sm text-gray-400">Wait for Dec 31</p>
+                <p className="text-base text-gray-300 font-semibold">Wait for Dec 31</p>
               </div>
               
               <div className="text-center">
-                <div className="mx-auto w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center mb-3 shadow-lg shadow-pink-500/50">
-                  <Sparkles className="w-8 h-8 text-white" />
+                <div className="mx-auto w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mb-4 shadow-2xl shadow-yellow-500/50 hover:scale-110 transition-all cursor-pointer animate-giftUnwrap">
+                  <Sparkles className="w-10 h-10 text-white" />
                 </div>
-                <p className="text-sm text-gray-400">Receive & Enjoy</p>
+                <p className="text-base text-gray-300 font-semibold">Receive & Enjoy!</p>
               </div>
             </div>
           </div>
 
-          {/* Additional Info Section */}
-          <div className="mt-16 grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            <div className="bg-gradient-to-br from-pink-900/20 to-purple-900/20 rounded-xl p-6 border border-pink-500/20">
+          {/* Additional Info Section - Enhanced */}
+          <div className="mt-20 grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            <div className="glass rounded-2xl p-8 border-pink-400/30 hover:border-pink-400/60 transition-all scroll-reveal">
               <div className="flex items-start gap-4">
-                <div className="bg-pink-500/20 rounded-lg p-3">
-                  <Sparkles className="w-6 h-6 text-pink-400" />
+                <div className="bg-gradient-to-br from-pink-400 to-pink-600 rounded-xl p-4 shadow-lg">
+                  <Sparkles className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-white mb-2">What's Inside?</h4>
+                  <h4 className="font-bold text-white mb-3 text-xl">What's Inside?</h4>
                   <p className="text-sm text-gray-400">It's a mystery! Could be tech, accessories, self-care, or something completely unexpected. All we can say is - it's unique and carefully chosen.</p>
                 </div>
               </div>
