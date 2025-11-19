@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Gift, Sparkles, Lock, Truck, Star, Calendar, CheckCircle, Mail, Instagram, Youtube } from 'lucide-react';
-import './App.css';
 
 // Load Razorpay script
 const loadRazorpayScript = () => {

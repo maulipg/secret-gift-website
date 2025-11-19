@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Gift box base -->
+  <rect x="50" y="90" width="100" height="80" fill="#FF6B6B" stroke="#000" stroke-width="3"/>
+  
+  <!-- Gift box lid -->
+  <path d="M 45 90 L 50 70 L 150 70 L 155 90 Z" fill="#FF8787" stroke="#000" stroke-width="3"/>
+  
+  <!-- Ribbon vertical -->
+  <rect x="95" y="70" width="10" height="100" fill="#FFD93D" stroke="#000" stroke-width="2"/>
+  
+  <!-- Ribbon horizontal -->
+  <rect x="50" y="125" width="100" height="10" fill="#FFD93D" stroke="#000" stroke-width="2"/>
+  
+  <!-- Bow loops -->
+  <ellipse cx="85" cy="60" rx="15" ry="12" fill="#FFD93D" stroke="#000" stroke-width="2"/>
+  <ellipse cx="115" cy="60" rx="15" ry="12" fill="#FFD93D" stroke="#000" stroke-width="2"/>
+  
+  <!-- Bow center knot -->
+  <circle cx="100" cy="60" r="8" fill="#FFA500" stroke="#000" stroke-width="2"/>
+  
+  <!-- Stars decoration -->
+  <path d="M 30 50 L 33 57 L 40 57 L 34 62 L 37 69 L 30 64 L 23 69 L 26 62 L 20 57 L 27 57 Z" fill="#FFD93D" opacity="0.8"/>
+  <path d="M 170 100 L 172 105 L 177 105 L 173 109 L 175 114 L 170 110 L 165 114 L 167 109 L 163 105 L 168 105 Z" fill="#FFD93D" opacity="0.8"/>
+  <path d="M 165 140 L 167 145 L 172 145 L 168 149 L 170 154 L 165 150 L 160 154 L 162 149 L 158 145 L 163 145 Z" fill="#FFD93D" opacity="0.8"/>
+  
+  <!-- Secret eye symbol -->
+  <ellipse cx="100" cy="130" rx="20" ry="12" fill="#FFF" opacity="0.3"/>
+  <circle cx="100" cy="130" r="6" fill="#000" opacity="0.3"/>
+</svg>
