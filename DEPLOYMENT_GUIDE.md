@@ -146,6 +146,27 @@ railway up
 
 ## 🐛 Troubleshooting
 
+### Issue: Netlify "Unrecognized Git contributor" error
+**Error:** "Your plan allows only one contributor on private repos"
+
+**Solutions (Choose one):**
+
+1. **Make Repository Public (Recommended for open source):**
+   ```powershell
+   # Go to GitHub → Your Repo → Settings → General
+   # Scroll to "Danger Zone" → "Change repository visibility"
+   # Click "Change visibility" → Select "Public"
+   ```
+
+2. **Link Git Account in Netlify:**
+   - Go to Netlify Dashboard → Team Settings
+   - Click "Git contributors" → "Link account"
+   - Authorize your GitHub account
+
+3. **Upgrade to Netlify Pro:**
+   - Allows unlimited contributors on private repos
+   - Go to Netlify → Billing → Upgrade
+
 ### Issue: "Failed to fetch" error
 - **Solution:** Check that backend URL is correct in `.env`
 - Verify backend is running: Visit backend URL in browser
