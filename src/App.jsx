@@ -68,6 +68,8 @@ export default function SecretGiftLanding() {
     const AMOUNT = 249; // ₹249
     const API_URL = import.meta.env.VITE_API_URL || 'https://webpage-et86.onrender.com';
 
+    
+
     try {
       // Create order from backend
       const response = await fetch(`${API_URL}/api/create-order`, {
