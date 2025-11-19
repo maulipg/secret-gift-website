@@ -66,7 +66,7 @@ export default function SecretGiftLanding() {
   const processPayment = async () => {
     const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID;
     const AMOUNT = 249; // ₹249
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    const API_URL = import.meta.env.VITE_API_URL || 'https://webpage-et86.onrender.com';
 
     try {
       // Create order from backend
