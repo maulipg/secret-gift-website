@@ -745,17 +745,145 @@ export default function SecretGiftLanding() {
         </div>
       </div>
 
+      {/* Horizontal Scrolling Gift Showcase - NEW */}
+      <div className="py-24 px-4 bg-gradient-to-r from-pink-900/20 via-purple-900/20 to-slate-900 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12 scroll-reveal">
+            <div className="inline-block mb-4 animate-bounceIn">
+              <Gift className="w-12 h-12 text-pink-400 animate-giftUnwrap" />
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">
+              Explore Our <span className="gradient-text">Gift Magic</span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-6">
+              Scroll sideways to discover the perfect gift moments for every special person in your life
+            </p>
+            <div className="flex items-center justify-center gap-2 text-pink-400 animate-pulse">
+              <span className="text-sm">👉 Swipe or scroll right</span>
+              <Sparkles className="w-4 h-4" />
+            </div>
+          </div>
+
+          {/* Horizontal Scrolling Container with Gift Unwrapping Effect */}
+          <div className="gift-scroller scroll-snap-x">
+            {[
+              {
+                title: "💝 For Mom",
+                subtitle: "The Queen of Your Heart",
+                desc: "Show her she's cherished with a surprise that speaks volumes",
+                image: "https://images.unsplash.com/photo-1609220136736-443140cffec6?w=600&q=80",
+                color: "pink",
+                icon: Heart
+              },
+              {
+                title: "💜 For Your Partner",
+                subtitle: "Keep the Spark Alive",
+                desc: "Romantic surprises that make every day feel like Valentine's Day",
+                image: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600&q=80",
+                color: "purple",
+                icon: Heart
+              },
+              {
+                title: "✨ For Your Sister",
+                subtitle: "Your Forever Friend",
+                desc: "Celebrate the bond that makes life brighter",
+                image: "https://images.unsplash.com/photo-1581403341630-a6e0b9d2d257?w=600&q=80",
+                color: "yellow",
+                icon: Star
+              },
+              {
+                title: "💚 For Your Best Friend",
+                subtitle: "Partners in Crime",
+                desc: "Because true friendship deserves to be celebrated",
+                image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=600&q=80",
+                color: "green",
+                icon: Users
+              },
+              {
+                title: "🎁 For Yourself",
+                subtitle: "You Deserve It",
+                desc: "Self-love is the best love - treat yourself to something special",
+                image: "https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=600&q=80",
+                color: "blue",
+                icon: Gift
+              },
+              {
+                title: "❤️ For Family",
+                subtitle: "Strengthen the Bond",
+                desc: "Create memories that last forever with thoughtful surprises",
+                image: "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=600&q=80",
+                color: "red",
+                icon: Users
+              },
+              {
+                title: "🎉 For Colleagues",
+                subtitle: "Workplace Joy",
+                desc: "Brighten their day and build lasting connections",
+                image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600&q=80",
+                color: "indigo",
+                icon: Star
+              },
+              {
+                title: "🌟 For Anyone Special",
+                subtitle: "Universal Delight",
+                desc: "Perfect for every occasion, every person, every time",
+                image: "https://images.unsplash.com/photo-1549887534-1541e9326642?w=600&q=80",
+                color: "pink",
+                icon: Sparkles
+              }
+            ].map((gift, idx) => (
+              <div
+                key={idx}
+                className="gift-card glass rounded-2xl overflow-hidden border-2 border-slate-700/50 hover:border-pink-400/60 min-w-[320px] md:min-w-[380px] scroll-reveal animate-slideInRight"
+                style={{ animationDelay: `${idx * 0.1}s` }}
+              >
+                <div className="relative h-56 overflow-hidden group">
+                  <img
+                    src={gift.image}
+                    alt={gift.title}
+                    className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
+                  />
+                  <div className={`absolute inset-0 bg-gradient-to-t from-${gift.color}-900/90 via-${gift.color}-900/50 to-transparent`}></div>
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    <gift.icon className={`w-20 h-20 text-${gift.color}-300 animate-giftUnwrap`} />
+                  </div>
+                  <div className="absolute top-4 right-4 bg-white/10 backdrop-blur-md rounded-full p-3 animate-pulse">
+                    <gift.icon className={`w-6 h-6 text-${gift.color}-300`} />
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-2xl font-bold text-white mb-2">{gift.title}</h3>
+                  <p className={`text-${gift.color}-400 font-semibold mb-3`}>{gift.subtitle}</p>
+                  <p className="text-gray-300 text-sm leading-relaxed mb-4">{gift.desc}</p>
+                  <button
+                    onClick={scrollToBooking}
+                    className={`w-full bg-gradient-to-r from-${gift.color}-500 to-purple-500 hover:from-${gift.color}-600 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-${gift.color}-500/50`}
+                  >
+                    Gift This 🎁
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Scroll Indicator */}
+          <div className="text-center mt-8 animate-pulse">
+            <p className="text-gray-400 text-sm">← Keep scrolling for more →</p>
+          </div>
+        </div>
+      </div>
+
       {/* Our Story & Experience */}
       <div className="py-20 px-4 bg-slate-800/30">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 scroll-reveal">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Our Story</h2>
             <p className="text-gray-400 max-w-3xl mx-auto">
               From a small idea to India's most exciting New Year tradition
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
+          <div className="grid md:grid-cols-2 gap-12 items-center mb-16 scroll-reveal">
             <div className="order-2 md:order-1 space-y-6">
               <div className="bg-gradient-to-br from-pink-900/20 to-purple-900/20 rounded-xl p-6 border border-pink-500/20">
                 <h3 className="text-2xl font-bold text-white mb-3">3+ Years of Magic</h3>
