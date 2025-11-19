@@ -68,7 +68,7 @@ export default function SecretGiftLanding() {
     const AMOUNT = 249; // ₹249
     const API_URL = import.meta.env.VITE_API_URL || 'https://webpage-et86.onrender.com';
 
-    
+
 
     try {
       // Create order from backend
@@ -555,7 +555,7 @@ export default function SecretGiftLanding() {
             <div className="bg-gradient-to-br from-pink-900/20 to-purple-900/20 rounded-xl p-6 border border-pink-500/20">
               <div className="flex items-center gap-3 mb-4">
                 <img 
-                  src="https://images.unsplash.com/photo-1667226983001-38b5ae7cd74f?w=100&q=80"
+                  src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80"
                   alt="Anjali"
                   className="w-12 h-12 rounded-full object-cover border-2 border-pink-400"
                 />
