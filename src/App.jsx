@@ -1,23 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Gift, Sparkles, Lock, Truck, Star, Calendar, CheckCircle, Mail, Instagram, Youtube } from 'lucide-react';
 
-// Load Razorpay script
-const loadRazorpayScript = () => {
-  return new Promise((resolve) => {
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
-  });
-};
-
 export default function SecretGiftLanding() {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [spotsLeft, setSpotsLeft] = useState(742);
   const [showBookingPopup, setShowBookingPopup] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [confetti, setConfetti] = useState([]);
+  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     const targetDate = new Date('2025-12-31T23:59:59');
@@ -39,9 +30,21 @@ export default function SecretGiftLanding() {
     return () => clearInterval(timer);
   }, []);
 
-  // Load Razorpay on component mount
+  // Load Razorpay immediately on component mount
   useEffect(() => {
-    loadRazorpayScript();
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    script.onload = () => setRazorpayLoaded(true);
+    script.onerror = () => console.error('Failed to load Razorpay');
+    document.body.appendChild(script);
+
+    return () => {
+      // Cleanup script on unmount
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -63,11 +66,20 @@ export default function SecretGiftLanding() {
   }, []);
 
   const processPayment = async () => {
+    // Prevent double-clicks
+    if (isProcessing) return;
+    
+    // Check if Razorpay is loaded
+    if (!razorpayLoaded || typeof window.Razorpay === 'undefined') {
+      alert('Payment system is loading. Please wait a moment and try again.');
+      return;
+    }
+
+    setIsProcessing(true);
+    
     const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID;
     const AMOUNT = 249; // ₹249
     const API_URL = import.meta.env.VITE_API_URL || 'https://webpage-et86.onrender.com';
-
-
 
     try {
       // Create order from backend
@@ -94,7 +106,7 @@ export default function SecretGiftLanding() {
         currency: data.order.currency,
         name: 'Secret Gift India',
         description: 'Secret Gift - 31st December 2025',
-        image: '', // Add your logo URL here
+        image: '/logo.svg',
         order_id: data.order.id,
         
         handler: async function (response) {
@@ -134,6 +146,8 @@ export default function SecretGiftLanding() {
           } catch (error) {
             console.error('Verification error:', error);
             alert('Payment verification failed. Please contact support with Payment ID: ' + response.razorpay_payment_id);
+          } finally {
+            setIsProcessing(false);
           }
         },
         prefill: {
@@ -151,26 +165,26 @@ export default function SecretGiftLanding() {
         modal: {
           ondismiss: function() {
             console.log('Payment cancelled by user');
+            setIsProcessing(false);
           },
           escape: true,
           backdropclose: false
         }
       };
 
-      // Check if Razorpay is loaded
-      if (typeof window.Razorpay !== 'undefined') {
-        const razorpay = new window.Razorpay(options);
-        razorpay.on('payment.failed', function (response) {
-          console.error('Payment failed:', response.error);
-          alert('Payment failed: ' + response.error.description);
-        });
-        razorpay.open();
-      } else {
-        alert('Payment gateway is loading. Please try again in a moment.');
-      }
+      // Open Razorpay instantly
+      const razorpay = new window.Razorpay(options);
+      razorpay.on('payment.failed', function (response) {
+        console.error('Payment failed:', response.error);
+        alert('Payment failed: ' + response.error.description);
+        setIsProcessing(false);
+      });
+      razorpay.open();
+      
     } catch (error) {
       console.error('Payment error:', error);
       alert('Failed to initiate payment. Please try again.');
+      setIsProcessing(false);
     }
   };
 
@@ -637,9 +651,14 @@ export default function SecretGiftLanding() {
 
             <button 
               onClick={processPayment}
-              className="w-full bg-pink-500 hover:bg-pink-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-pink-500/50"
+              disabled={isProcessing || !razorpayLoaded}
+              className={`w-full px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 shadow-lg 
+                ${isProcessing || !razorpayLoaded 
+                  ? 'bg-gray-500 cursor-not-allowed' 
+                  : 'bg-pink-500 hover:bg-pink-600 hover:shadow-pink-500/50'
+                } text-white`}
             >
-              Book Now - ₹249 🎁
+              {isProcessing ? '⏳ Processing...' : !razorpayLoaded ? '⏳ Loading...' : 'Book Now - ₹249 🎁'}
             </button>
 
             <p className="text-xs text-gray-500 mt-4 text-center">
