@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Gift, Sparkles, Lock, Truck, Star, Calendar, CheckCircle, Mail, Instagram, Youtube, Heart, Users, Package } from 'lucide-react';
+import { Gift, Sparkles, Lock, Truck, Star, Calendar, CheckCircle, Mail, Instagram, Youtube, Heart, Users, Package, Menu, X } from 'lucide-react';
 
 export default function SecretGiftLanding() {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -10,8 +10,20 @@ export default function SecretGiftLanding() {
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [floatingHearts, setFloatingHearts] = useState([]);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
   
   const observerRef = useRef(null);
+
+  // Track scroll position for parallax effects
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Intersection Observer for scroll animations
   useEffect(() => {
@@ -229,10 +241,102 @@ export default function SecretGiftLanding() {
 
   const scrollToBooking = () => {
     document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+    setMenuOpen(false);
+  };
+
+  const scrollToSection = (id) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    setMenuOpen(false);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-900/40 to-slate-900 text-white overflow-x-hidden">
+      {/* Navigation Menu Button */}
+      <button
+        onClick={() => setMenuOpen(true)}
+        className="fixed top-6 right-6 z-40 bg-gradient-to-r from-pink-500 to-purple-500 p-3 rounded-full shadow-2xl hover:shadow-pink-500/50 transition-all hover:scale-110 animate-glowPulse"
+        aria-label="Open menu"
+      >
+        <Menu className="w-6 h-6 text-white" />
+      </button>
+
+      {/* Animated Navigation Drawer - Gift Unwrap Style */}
+      {menuOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 animate-fadeInUp"
+            onClick={() => setMenuOpen(false)}
+          />
+          
+          {/* Drawer - Unwrapping Animation */}
+          <div className="fixed right-0 top-0 bottom-0 w-80 max-w-full z-50 menu-overlay">
+            <div className="h-full bg-gradient-to-br from-pink-900/95 via-purple-900/95 to-slate-900/95 backdrop-blur-xl border-l border-pink-400/30 p-8 flex flex-col">
+              {/* Close Button */}
+              <button
+                onClick={() => setMenuOpen(false)}
+                className="self-end mb-8 p-2 hover:bg-white/10 rounded-full transition-all hover:rotate-90"
+                aria-label="Close menu"
+              >
+                <X className="w-6 h-6 text-white" />
+              </button>
+
+              {/* Animated Gift Icon */}
+              <div className="mb-8 text-center animate-bounceIn">
+                <div className="inline-block relative">
+                  <Gift className="w-16 h-16 text-pink-400 animate-giftUnwrap" />
+                  <Sparkles className="w-6 h-6 text-yellow-400 absolute -top-1 -right-1 animate-pulse" />
+                </div>
+                <h2 className="text-2xl font-bold mt-4 gradient-text">Secret Gift</h2>
+              </div>
+
+              {/* Menu Items with Staggered Animation */}
+              <nav className="flex-1 space-y-4">
+                {[
+                  { label: '🏠 Home', action: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
+                  { label: '💝 Our Story', action: () => scrollToSection('story') },
+                  { label: '🎯 How It Works', action: () => scrollToSection('how-it-works') },
+                  { label: '⭐ Reviews', action: () => scrollToSection('reviews') },
+                  { label: '🎁 Book Now', action: scrollToBooking }
+                ].map((item, idx) => (
+                  <button
+                    key={idx}
+                    onClick={item.action}
+                    className="w-full text-left px-6 py-4 rounded-xl glass border-pink-400/20 hover:border-pink-400/60 transition-all hover:translate-x-2 text-lg font-semibold hover:bg-white/5 animate-slideInRight"
+                    style={{ animationDelay: `${idx * 0.1}s` }}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </nav>
+
+              {/* Social Links with Animation */}
+              <div className="mt-8 pt-8 border-t border-pink-400/20">
+                <p className="text-sm text-gray-300 mb-4 animate-fadeInUp">Connect with us</p>
+                <div className="flex gap-4 justify-center">
+                  {[
+                    { icon: Instagram, href: '#', color: 'pink' },
+                    { icon: Youtube, href: '#', color: 'red' },
+                    { icon: Mail, href: 'mailto:secretgiftindia@gmail.com', color: 'purple' }
+                  ].map((social, idx) => (
+                    <a
+                      key={idx}
+                      href={social.href}
+                      className={`p-3 rounded-full glass border-${social.color}-400/30 hover:border-${social.color}-400/60 transition-all hover:scale-110 animate-bounceIn`}
+                      style={{ animationDelay: `${0.5 + idx * 0.1}s` }}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <social.icon className={`w-5 h-5 text-${social.color}-400`} />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
       {/* Floating confetti */}
       {confetti.map(c => (
         <div
@@ -249,8 +353,11 @@ export default function SecretGiftLanding() {
 
       {/* Hero Section - Emotional & Animated */}
       <div className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0 z-0">
+        {/* Animated Background with Parallax */}
+        <div 
+          className="absolute inset-0 z-0 parallax"
+          style={{ transform: `translateY(${scrollY * 0.5}px)` }}
+        >
           <img 
             src="https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=1920&q=80" 
             alt="Gift giving moment" 
@@ -273,19 +380,28 @@ export default function SecretGiftLanding() {
             <Heart className="w-6 h-6" fill="currentColor" />
           </div>
         ))}
+
+        {/* Decorative Rolling Gifts */}
+        <div className="absolute top-1/4 left-10 animate-rollIn opacity-20 hidden md:block">
+          <Gift className="w-16 h-16 text-pink-300" />
+        </div>
+        <div className="absolute bottom-1/4 right-10 animate-rollIn opacity-20 hidden md:block" style={{ animationDelay: '0.3s' }}>
+          <Gift className="w-20 h-20 text-purple-300" />
+        </div>
         
         <div className="relative z-10 text-center max-w-5xl mx-auto">
-          {/* Animated Gift Icon */}
-          <div className="inline-block mb-8 animate-giftUnwrap">
+          {/* Animated Gift Icon with Bounce */}
+          <div className="inline-block mb-8 animate-bounceIn">
             <div className="relative">
-              <Gift className="w-20 h-20 text-pink-400 mx-auto drop-shadow-2xl" />
-              <Sparkles className="w-8 h-8 text-yellow-400 absolute -top-2 -right-2 animate-pulse" />
+              <Gift className="w-24 h-24 text-pink-400 mx-auto drop-shadow-2xl animate-giftUnwrap" />
+              <Sparkles className="w-10 h-10 text-yellow-400 absolute -top-2 -right-2 animate-pulse" />
+              <div className="absolute -bottom-2 -left-2 w-8 h-8 bg-pink-400/30 rounded-full blur-xl animate-pulse"></div>
             </div>
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white leading-tight scroll-reveal">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white leading-tight animate-textReveal">
             Give the Gift of
-            <span className="block gradient-text text-6xl md:text-8xl mt-2">
+            <span className="block gradient-text text-6xl md:text-8xl mt-2 animate-bounceIn" style={{ animationDelay: '0.3s' }}>
               Pure Joy ✨
             </span>
           </h1>
@@ -361,7 +477,7 @@ export default function SecretGiftLanding() {
       </div>
 
       {/* Emotional Story Section - NEW */}
-      <div className="py-24 px-4 bg-gradient-to-b from-slate-900 to-slate-800 relative overflow-hidden">
+      <div id="story" className="py-24 px-4 bg-gradient-to-b from-slate-900 to-slate-800 relative overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16 scroll-reveal">
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">
@@ -472,7 +588,7 @@ export default function SecretGiftLanding() {
       </div>
 
       {/* How It Works */}
-      <div className="py-20 px-4 bg-slate-800/50">
+      <div id="how-it-works" className="py-20 px-4 bg-slate-800/50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-5xl font-bold text-center mb-4 text-white scroll-reveal">How It Works</h2>
           <p className="text-center text-gray-300 mb-4 text-xl scroll-reveal">Simple. Thoughtful. Magical.</p>
@@ -760,9 +876,9 @@ export default function SecretGiftLanding() {
       </div>
 
       {/* Customer Stories */}
-      <div className="py-20 px-4">
+      <div id="reviews" className="py-20 px-4 scroll-reveal">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 scroll-reveal">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Stories That Warm Our Hearts</h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
               Real moments, real joy. Here's what makes this journey special.

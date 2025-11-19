@@ -97,6 +97,89 @@ body {
   }
 }
 
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes unwrapDrawer {
+  0% {
+    clip-path: polygon(50% 0%, 50% 0%, 50% 100%, 50% 100%);
+    opacity: 0;
+  }
+  50% {
+    clip-path: polygon(0% 0%, 100% 0%, 100% 50%, 0% 50%);
+    opacity: 0.5;
+  }
+  100% {
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+    opacity: 1;
+  }
+}
+
+@keyframes rollIn {
+  from {
+    transform: translateX(-100%) rotate(-360deg);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3) rotate(-10deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05) rotate(5deg);
+  }
+  70% {
+    transform: scale(0.9) rotate(-3deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(236, 72, 153, 0.8), 0 0 60px rgba(139, 92, 246, 0.6);
+  }
+}
+
+@keyframes textReveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
 @keyframes heartbeat {
   0%, 100% {
     transform: scale(1);
@@ -147,10 +230,43 @@ body {
   animation: heartbeat 1.5s ease-in-out infinite;
 }
 
+.animate-rollIn {
+  animation: rollIn 1s ease-out forwards;
+}
+
+.animate-bounceIn {
+  animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+.animate-slideInLeft {
+  animation: slideInFromLeft 0.6s ease-out forwards;
+}
+
+.animate-slideInRight {
+  animation: slideInFromRight 0.6s ease-out forwards;
+}
+
+.animate-glowPulse {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+.animate-unwrapDrawer {
+  animation: unwrapDrawer 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+.animate-textReveal {
+  animation: textReveal 1s ease-out forwards;
+}
+
 .shimmer {
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
   background-size: 1000px 100%;
   animation: shimmer 3s infinite;
+}
+
+/* Parallax effect */
+.parallax {
+  transition: transform 0.1s ease-out;
 }
 
 /* Glass morphism effect */
@@ -178,4 +294,17 @@ body {
 .scroll-reveal.revealed {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Rolling gift box animation */
+.gift-roll {
+  animation: rollIn 1.2s ease-out;
+}
+
+/* Menu overlay with unwrap effect */
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  animation: unwrapDrawer 0.5s ease-out forwards;
 }
