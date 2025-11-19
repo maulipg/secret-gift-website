@@ -12,18 +12,46 @@ export default function SecretGiftLanding() {
   const [floatingHearts, setFloatingHearts] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [scrollSpeed, setScrollSpeed] = useState(0);
+  const [giftBoxRotation, setGiftBoxRotation] = useState(0);
+  const [isGiftOpening, setIsGiftOpening] = useState(false);
+  const lastScrollY = useRef(0);
+  const lastScrollTime = useRef(Date.now());
   
   const observerRef = useRef(null);
 
-  // Track scroll position for parallax effects
+  // Track scroll position and speed for parallax and gift box
   useEffect(() => {
     const handleScroll = () => {
-      setScrollY(window.scrollY);
+      const currentScrollY = window.scrollY;
+      const currentTime = Date.now();
+      const timeDiff = currentTime - lastScrollTime.current;
+      const scrollDiff = currentScrollY - lastScrollY.current;
+      
+      // Calculate scroll speed
+      const speed = Math.abs(scrollDiff / timeDiff) * 100;
+      setScrollSpeed(speed);
+      
+      // Update rotation based on scroll direction and speed
+      setGiftBoxRotation(prev => {
+        const rotation = prev + (scrollDiff * (speed > 5 ? 2 : 0.5));
+        return rotation % 360;
+      });
+
+      // Trigger gift opening on fast scroll
+      if (speed > 20 && !isGiftOpening) {
+        setIsGiftOpening(true);
+        setTimeout(() => setIsGiftOpening(false), 600);
+      }
+      
+      setScrollY(currentScrollY);
+      lastScrollY.current = currentScrollY;
+      lastScrollTime.current = currentTime;
     };
     
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isGiftOpening]);
 
   // Intersection Observer for scroll animations
   useEffect(() => {
@@ -251,6 +279,49 @@ export default function SecretGiftLanding() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-900/40 to-slate-900 text-white overflow-x-hidden">
+      {/* Floating Scroll Gift Box */}
+      {scrollY > 100 && (
+        <div className="floating-gift-box">
+          <div 
+            className={`gift-box-container ${isGiftOpening ? 'opening' : ''}`}
+            style={{ 
+              transform: `rotateY(${giftBoxRotation}deg) rotateX(${Math.sin(giftBoxRotation * Math.PI / 180) * 10}deg)` 
+            }}
+          >
+            {/* Gift Sparkles */}
+            <div className="gift-sparkles">
+              <div className="sparkle"></div>
+              <div className="sparkle"></div>
+              <div className="sparkle"></div>
+              <div className="sparkle"></div>
+              <div className="sparkle"></div>
+            </div>
+
+            {/* Gift Box Base */}
+            <div className="gift-box-base"></div>
+
+            {/* Gift Box Lid */}
+            <div className="gift-box-lid"></div>
+
+            {/* Ribbons */}
+            <div className="gift-ribbon-vertical"></div>
+            <div className="gift-ribbon-horizontal"></div>
+
+            {/* Bow */}
+            <div className="gift-bow">
+              <div className="bow-loop bow-loop-left"></div>
+              <div className="bow-loop bow-loop-right"></div>
+              <div className="bow-center"></div>
+            </div>
+          </div>
+
+          {/* Scroll Progress */}
+          <div className="scroll-progress-text">
+            {Math.min(Math.round((scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100), 100)}%
+          </div>
+        </div>
+      )}
+
       {/* Navigation Menu Button */}
       <button
         onClick={() => setMenuOpen(true)}
