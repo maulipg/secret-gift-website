@@ -3,8 +3,11 @@ import cors from 'cors';
 const corsMiddleware = cors({
   origin: process.env.NODE_ENV === 'production' 
     ? [
+        'https://secretgiftindia.shop',
+        'http://secretgiftindia.shop',
+        'https://www.secretgiftindia.shop',
+        'http://www.secretgiftindia.shop',
         'https://secretgiftindia-prog.github.io',
-        'https://your-netlify-site.netlify.app',
         /\.netlify\.app$/
       ]
     : '*',
