@@ -595,7 +595,7 @@ export default function SecretGiftLanding() {
             <div className="scroll-reveal">
               <div className="relative group">
                 <img 
-                  src="https://images.unsplash.com/photo-1549887534-1541e9326642?w=800&q=80" 
+                  src="https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=800&q=80" 
                   alt="Gift for her" 
                   className="rounded-2xl shadow-2xl transform group-hover:scale-105 transition-all duration-500"
                 />
